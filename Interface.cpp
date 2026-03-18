@@ -2,6 +2,12 @@
 #include <limits>
 #include "Interface.h"
 
+void Interface::print(const std::string &message)
+{
+    std::cout << message << '\n';
+}
+
+
 void Interface::printMenu()
 {
 	std::cout << "================\n";
@@ -12,8 +18,7 @@ void Interface::printMenu()
 	std::cout << "[3] Delete Task \n";
 	std::cout << "[4] Exit        \n";
 }
-
-int Interface::getMenuChoice(int min, int max)
+int Interface::getMenuChoice(const int min,const int max)
 {
     int x;
 
@@ -38,6 +43,31 @@ int Interface::getMenuChoice(int min, int max)
         return x;
     }
 }
+
+
+
+std::string Interface::askName()
+{
+    std::string name;
+
+    std::cout << "Enter name: \n";
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    std::getline(std::cin, name);
+
+    return name;
+}
+std::string Interface::askPriority()
+{
+    std::string priority;
+
+    std::cout << "Enter priority: \n";
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    std::getline(std::cin, priority);
+
+    return priority;
+}
+
+
 
 void Interface::pause()
 {

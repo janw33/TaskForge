@@ -1,21 +1,24 @@
 ﻿#include "Interface.h"
+#include "TaskManager.h"
 
 int main()
 {
-    Interface interface;
+    Interface ui;
+    TaskManager manager(ui);
 
     while (true)
     {
 
-        interface.printMenu();
-        int choice = interface.getMenuChoice(1, 4);
+        ui.printMenu();
+        int choice = ui.getMenuChoice(1, 4);
+        ui.clearScreen();
 
         switch (choice)
         {
         case 1:break;
-        case 2:break;
+        case 2: manager.addTask();  break;
         case 3:break;
-        case 4:break;
+        case 4: ui.print("Goodbye!"); return 0;
         }
 
     }
