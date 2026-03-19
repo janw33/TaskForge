@@ -5,9 +5,15 @@ TaskManager::TaskManager(Interface& ui)
 {
 }
 
+
+
 void TaskManager::addTask()
 {
-    std::string name = ui.askName();
-    std::string priority = ui.askPriority();
+    std::string name = ui.askString("Enter name: ");
+    std::string priority = ui.askString("Enter priority: ");
     tasks.emplace_back(name, priority, nextId++);
+}
+void TaskManager::deleteTask()
+{
+   
 }

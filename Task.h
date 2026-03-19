@@ -9,4 +9,9 @@ class Task
 	bool isDone;
 public:
 	Task(const std::string& name, const std::string& priority, int id);
+
+	const std::string &getName() const;
+	const std::string &getPriority() const;
+	int getId() const;
+	bool getIsDone() const;
 };

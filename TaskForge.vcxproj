@@ -127,12 +127,16 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Account.cpp" />
+    <ClCompile Include="AccountManager.cpp" />
     <ClCompile Include="Interface.cpp" />
     <ClCompile Include="Task.cpp" />
     <ClCompile Include="TaskForge.cpp" />
     <ClCompile Include="TaskManager.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Account.h" />
+    <ClInclude Include="AccountManager.h" />
     <ClInclude Include="Interface.h" />
     <ClInclude Include="Task.h" />
     <ClInclude Include="TaskManager.h" />

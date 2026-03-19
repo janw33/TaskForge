@@ -5,14 +5,13 @@ class Interface
 {
 public:
 	void print(const std::string& message);
+	std::string askString(const std::string& prompt);
 
 	void printMenu();
-	int getMenuChoice(int min, int max);
+
+	void printAccountMenu();
+	int getChoice(int min, int max);
 	
-	std::string askName();
-	std::string askPriority();
-
-
 	void pause();
 	void clearScreen();
 };

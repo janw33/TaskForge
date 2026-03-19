@@ -2,69 +2,66 @@
 #include <limits>
 #include "Interface.h"
 
+
 void Interface::print(const std::string &message)
 {
     std::cout << message << '\n';
 }
+std::string Interface::askString(const std::string& prompt)
+{
+    std::string input;
+
+    std::cout << prompt;
+    std::getline(std::cin, input);
+
+    return input;
+}
+
 
 
 void Interface::printMenu()
 {
+    std::cout << "================\n";
+    std::cout << "      Menu      \n";
+    std::cout << "================\n";
+    std::cout << "[1] Sign Up     \n";
+    std::cout << "[2] Log In      \n";
+    std::cout << "[3] Exit        \n";
+}
+
+
+
+void Interface::printAccountMenu()
+{
 	std::cout << "================\n";
-	std::cout << "      Menu      \n";
+	std::cout << "  Account Menu  \n";
 	std::cout << "================\n";
 	std::cout << "[1] Show Tasks  \n";
 	std::cout << "[2] Add Task    \n";
 	std::cout << "[3] Delete Task \n";
 	std::cout << "[4] Exit        \n";
 }
-int Interface::getMenuChoice(const int min,const int max)
+
+
+
+int Interface::getChoice(int min, int max)
 {
-    int x;
+    std::string input;
 
     while (true)
     {
-        std::cout << "Choose option (" << min << "-" << max << "): ";
+        std::getline(std::cin, input);
 
-        if (!(std::cin >> x))
+        if (input.size() == 1 && input[0] >= '0' && input[0] <= '9')
         {
-            std::cout << "You must enter a number!\n";
-            std::cin.clear();
-            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-            continue;
+            int choice = input[0] - '0';
+
+            if (choice >= min && choice <= max)
+                return choice;
         }
 
-        if (x < min || x > max)
-        {
-            std::cout << "Invalid option!\n";
-            continue;
-        }
-
-        return x;
+        std::cout << "Invalid choice, please try again:\n";
     }
-}
-
-
-
-std::string Interface::askName()
-{
-    std::string name;
-
-    std::cout << "Enter name: \n";
-    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-    std::getline(std::cin, name);
-
-    return name;
-}
-std::string Interface::askPriority()
-{
-    std::string priority;
-
-    std::cout << "Enter priority: \n";
-    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-    std::getline(std::cin, priority);
-
-    return priority;
 }
 
 

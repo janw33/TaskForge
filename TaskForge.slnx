@@ -3,5 +3,5 @@
     <Platform Name="x64" />
     <Platform Name="x86" />
   </Configurations>
-  <Project Path="TaskForge.vcxproj" />
+  <Project Path="TaskForge.vcxproj" Id="6b9dd5e3-4132-4022-89ec-bb7cf764de24" />
 </Solution>
