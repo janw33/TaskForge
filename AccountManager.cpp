@@ -7,12 +7,60 @@ AccountManager::AccountManager(Interface& ui)
 
 
 
+bool AccountManager::isUsernameTaken(const std::string &username)
+{
+    for (const auto& acc : accounts)
+    {
+        if (acc.getUsername() == username)
+        {
+            return true;
+        }
+    }
+    return false;
+}
 void AccountManager::signUp(bool &logged)
 {
-    std::string username = ui.askString("Enter Username: ");
-    std::string password = ui.askString("Enter Passwor : ");
-    accounts.emplace_back(username, password, nextId++);
-    logged = true;
+    while (true)
+    {
+        std::string username = ui.askString("Enter Username: ");
+
+        if (isUsernameTaken(username))
+        {
+            ui.printPauseClear("Username is already taken");
+            continue;
+        }
+
+        const auto &usernameErrors = UserValidator::isUsernameValid(username);
+
+        if (!usernameErrors.empty())
+        {
+            for (const auto& error : usernameErrors)
+            {
+                ui.print (error);
+            }
+            ui.pauseClear();
+            continue;
+        }
+
+        std::string password = ui.askPassword("Enter Password: ");
+
+        const auto& passwordErrors = UserValidator::isPasswordValid(password);
+
+        if (!passwordErrors.empty())
+        {
+            for (const auto& error : passwordErrors)
+            {
+                ui.print(error);
+            }
+            ui.pauseClear();
+            continue;
+        }
+
+        accounts.emplace_back(std::move(username), std::move(password), nextId++);
+        logged = true;
+        ui.printPauseClear("Sign up Successfully");
+        return;
+    }
 }
 
 
@@ -23,7 +71,6 @@ bool AccountManager::isDataValid(const std::string& username, const std::string&
     {
         if (acc.getUsername() == username && acc.getPassword() == password)
         {
-            ui.print("Logged in Sucesfully!");
             return true;
         }
     }
@@ -34,14 +81,15 @@ void AccountManager::logIn(bool& logged)
     while (true)
     {
         std::string username = ui.askString("Enter Username: ");
-        std::string password = ui.askString("Enter Passwor : ");
+        std::string password = ui.askPassword("Enter Password: ");
 
         if (isDataValid(username, password))
         {
+            ui.printPauseClear("Logged in Sucesfully!");
             logged = true;
             return;
         }
 
-        ui.print("Username or password is invalid. Please try again!");
+        ui.printPauseClear("Username or password is invalid. Please try again!");
     }
 }

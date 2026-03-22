@@ -1,5 +1,6 @@
 #include <iostream>
 #include <limits>
+#include <conio.h>
 #include "Interface.h"
 
 
@@ -15,6 +16,12 @@ std::string Interface::askString(const std::string& prompt)
     std::getline(std::cin, input);
 
     return input;
+}
+
+std::string Interface::askPassword(const std::string& prompt)
+{
+    std::cout << prompt;
+    return inputPassword();
 }
 
 
@@ -69,10 +76,61 @@ int Interface::getChoice(int min, int max)
 void Interface::pause()
 {
     std::cout << "Press Enter to continue...";
-    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-    std::cin.get();
+    std::string tmp;
+    std::getline(std::cin, tmp);
 }
+
 void Interface::clearScreen()
 {
     std::cout << "\033[2J\033[1;1H";
+}
+
+void Interface::pauseClear()
+{
+     pause();
+    clearScreen();
+}
+
+void Interface::printPauseClear(std::string error)
+{
+    print(error);
+    pause();
+    clearScreen();
+}
+
+
+
+std::string Interface::inputPassword()
+{
+    std::string password;
+    char c;
+
+    const char ENTER = '\r';
+    const char BACKSPACE = '\b';
+
+    while ((c = _getch()) != ENTER)
+    {
+        if (c == 0 || c == 224)
+        {
+            _getch();
+            continue;
+        }
+
+        if (c == BACKSPACE)
+        {
+            if (!password.empty())
+            {
+                password.pop_back();
+                std::cout << "\b \b";
+            }
+        }
+        else
+        {
+            password += c;
+            std::cout << "*";
+        }
+    }
+
+    std::cout << "\n";
+    return password;
 }
