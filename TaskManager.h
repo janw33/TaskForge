@@ -9,7 +9,8 @@ class TaskManager
 {
 	Interface& ui;
 	std::vector<Task>tasks;
-	int nextId;
+	std::map<int, size_t>taskIdToIndex;
+	int taskNextId;
 
 public:
 	TaskManager(Interface& ui);

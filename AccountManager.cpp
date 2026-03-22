@@ -23,14 +23,14 @@ void AccountManager::signUp(bool &logged)
     while (true)
     {
         std::string username = ui.askString("Enter Username: ");
-
+        /* userValidation
         if (isUsernameTaken(username))
         {
             ui.printPauseClear("Username is already taken");
             continue;
         }
-
-        const auto &usernameErrors = UserValidator::isUsernameValid(username);
+       
+        auto usernameErrors = UserValidator::isUsernameValid(username);
 
         if (!usernameErrors.empty())
         {
@@ -41,10 +41,12 @@ void AccountManager::signUp(bool &logged)
             ui.pauseClear();
             continue;
         }
+        */
 
         std::string password = ui.askPassword("Enter Password: ");
 
-        const auto& passwordErrors = UserValidator::isPasswordValid(password);
+        /* passwordValidation
+        auto passwordErrors = UserValidator::isPasswordValid(password);
 
         if (!passwordErrors.empty())
         {
@@ -55,7 +57,7 @@ void AccountManager::signUp(bool &logged)
             ui.pauseClear();
             continue;
         }
-
+        */
         accounts.emplace_back(std::move(username), std::move(password), nextId++);
         logged = true;
         ui.printPauseClear("Sign up Successfully");
@@ -65,7 +67,7 @@ void AccountManager::signUp(bool &logged)
 
 
 
-bool AccountManager::isDataValid(const std::string& username, const std::string& password)
+bool AccountManager::areCredentialsValid(const std::string& username, const std::string& password)
 {
     for (const auto& acc : accounts)
     {
@@ -83,9 +85,9 @@ void AccountManager::logIn(bool& logged)
         std::string username = ui.askString("Enter Username: ");
         std::string password = ui.askPassword("Enter Password: ");
 
-        if (isDataValid(username, password))
+        if (areCredentialsValid(username, password))
         {
-            ui.printPauseClear("Logged in Sucesfully!");
+            ui.printPauseClear("Logged in Successfully!");
             logged = true;
             return;
         }

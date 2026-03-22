@@ -11,10 +11,10 @@ class AccountManager
 	int nextId;
 
 	bool isUsernameTaken(const std::string& usernmame);
-	bool isDataValid(const std::string& username, const std::string& password);
+	bool areCredentialsValid(const std::string& username, const std::string& password);
 public:
 	AccountManager(Interface& ui);
 		
-	void signUp(bool &logged);
+	void signUp(bool &logged); // dodaj haslo jako hash!
 	void logIn(bool &logged);
 };
