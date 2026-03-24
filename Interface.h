@@ -9,8 +9,9 @@ public:
 	std::string askPassword(const std::string& prompt);
 
 	void printMenu();
-
 	void printAccountMenu();
+	void printProjectMenu();
+
 	int getChoice(int min, int max);
 	
 

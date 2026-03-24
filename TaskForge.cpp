@@ -1,12 +1,12 @@
 ﻿#include "Interface.h"
 #include "AccountManager.h"
-#include "TaskManager.h"
+#include "ProjectManager.h"
 
 int main()
 {
     Interface ui;
-    AccountManager accountmanager(ui);
-    TaskManager taskmanager(ui);
+    AccountManager accountManager(ui);
+    ProjectManager projectManager(ui);
 
     while (true)
     {
@@ -20,8 +20,8 @@ int main()
 
             switch (choice)
             {
-            case 1:  accountmanager.signUp(logged); break;
-            case 2:  accountmanager.logIn(logged); break;
+            case 1:  accountManager.signUp(logged); break;
+            case 2:  accountManager.logIn(logged); break;
             case 3:  ui.print("Goodbye!"); return 0;
             }
         }
@@ -36,9 +36,9 @@ int main()
 
             switch (accountChoice)
             {
-            case 1:break;
-            case 2: taskmanager.addTask(); break;
-            case 3: taskmanager.deleteTask();  break;
+            case 1: projectManager.chooseProject(); break;
+            case 2: projectManager.addProject(); break;
+            case 3: projectManager.deleteProject();  break;
             case 4: ui.print("Goodbye!");  break;
             }
         }
