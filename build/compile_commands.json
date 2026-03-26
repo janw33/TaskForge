@@ -1,0 +1,50 @@
+[
+{
+  "directory": "/Users/janwypych/TaskForge/build",
+  "command": "/usr/bin/c++   -g -std=gnu++17 -arch arm64 -o CMakeFiles/TaskForge.dir/Account.cpp.o -c /Users/janwypych/TaskForge/Account.cpp",
+  "file": "/Users/janwypych/TaskForge/Account.cpp",
+  "output": "CMakeFiles/TaskForge.dir/Account.cpp.o"
+},
+{
+  "directory": "/Users/janwypych/TaskForge/build",
+  "command": "/usr/bin/c++   -g -std=gnu++17 -arch arm64 -o CMakeFiles/TaskForge.dir/AccountManager.cpp.o -c /Users/janwypych/TaskForge/AccountManager.cpp",
+  "file": "/Users/janwypych/TaskForge/AccountManager.cpp",
+  "output": "CMakeFiles/TaskForge.dir/AccountManager.cpp.o"
+},
+{
+  "directory": "/Users/janwypych/TaskForge/build",
+  "command": "/usr/bin/c++   -g -std=gnu++17 -arch arm64 -o CMakeFiles/TaskForge.dir/Interface.cpp.o -c /Users/janwypych/TaskForge/Interface.cpp",
+  "file": "/Users/janwypych/TaskForge/Interface.cpp",
+  "output": "CMakeFiles/TaskForge.dir/Interface.cpp.o"
+},
+{
+  "directory": "/Users/janwypych/TaskForge/build",
+  "command": "/usr/bin/c++   -g -std=gnu++17 -arch arm64 -o CMakeFiles/TaskForge.dir/Project.cpp.o -c /Users/janwypych/TaskForge/Project.cpp",
+  "file": "/Users/janwypych/TaskForge/Project.cpp",
+  "output": "CMakeFiles/TaskForge.dir/Project.cpp.o"
+},
+{
+  "directory": "/Users/janwypych/TaskForge/build",
+  "command": "/usr/bin/c++   -g -std=gnu++17 -arch arm64 -o CMakeFiles/TaskForge.dir/ProjectManager.cpp.o -c /Users/janwypych/TaskForge/ProjectManager.cpp",
+  "file": "/Users/janwypych/TaskForge/ProjectManager.cpp",
+  "output": "CMakeFiles/TaskForge.dir/ProjectManager.cpp.o"
+},
+{
+  "directory": "/Users/janwypych/TaskForge/build",
+  "command": "/usr/bin/c++   -g -std=gnu++17 -arch arm64 -o CMakeFiles/TaskForge.dir/Task.cpp.o -c /Users/janwypych/TaskForge/Task.cpp",
+  "file": "/Users/janwypych/TaskForge/Task.cpp",
+  "output": "CMakeFiles/TaskForge.dir/Task.cpp.o"
+},
+{
+  "directory": "/Users/janwypych/TaskForge/build",
+  "command": "/usr/bin/c++   -g -std=gnu++17 -arch arm64 -o CMakeFiles/TaskForge.dir/TaskForge.cpp.o -c /Users/janwypych/TaskForge/TaskForge.cpp",
+  "file": "/Users/janwypych/TaskForge/TaskForge.cpp",
+  "output": "CMakeFiles/TaskForge.dir/TaskForge.cpp.o"
+},
+{
+  "directory": "/Users/janwypych/TaskForge/build",
+  "command": "/usr/bin/c++   -g -std=gnu++17 -arch arm64 -o CMakeFiles/TaskForge.dir/UserValidator.cpp.o -c /Users/janwypych/TaskForge/UserValidator.cpp",
+  "file": "/Users/janwypych/TaskForge/UserValidator.cpp",
+  "output": "CMakeFiles/TaskForge.dir/UserValidator.cpp.o"
+}
+]

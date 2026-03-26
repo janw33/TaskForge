@@ -1,0 +1,3 @@
+/Users/janwypych/TaskForge/build/CMakeFiles/TaskForge.dir
+/Users/janwypych/TaskForge/build/CMakeFiles/edit_cache.dir
+/Users/janwypych/TaskForge/build/CMakeFiles/rebuild_cache.dir
