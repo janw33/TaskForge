@@ -1,7 +1,7 @@
 #include "ProjectManager.h"
 
 ProjectManager::ProjectManager(Interface& ui)
-    : ui(ui), projectNextId(1), currentProjectIndex(0)
+    : ui(ui), projectNextId(1)
 {
 }
 
@@ -15,7 +15,6 @@ bool ProjectManager::isIdChoiceCorrect(int id)
 
         if (id == projectId)
         {
-            currentProjectIndex = i;
             return true;
         }
     }

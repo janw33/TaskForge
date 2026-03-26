@@ -22,3 +22,13 @@ int Account::getId() const
     return id;
 }
 
+
+
+void Account::setUsername(const std::string &newUsername)
+{
+    username = newUsername;
+}
+void Account::setPassword(const std::string &newPassword)
+{
+    password = newPassword;
+}

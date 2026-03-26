@@ -7,7 +7,6 @@ class ProjectManager
 {
 	Interface& ui;
 	std::vector<Project> projects;
-	size_t currentProjectIndex;
 	int projectNextId;
 
 	bool isIdChoiceCorrect(int id);

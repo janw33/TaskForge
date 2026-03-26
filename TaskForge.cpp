@@ -10,6 +10,7 @@ int main()
 
     while (true)
     {
+        ui.clearScreen();
         bool logged = false;
 
         while (!logged)
@@ -28,10 +29,10 @@ int main()
 
         int accountChoice = 0;
 
-        while (accountChoice != 4)
+        while (accountChoice != 5)
         {
             ui.printAccountMenu();
-            accountChoice = ui.getChoice(1, 4);
+            accountChoice = ui.getChoice(1, 5);
             ui.clearScreen();
 
             switch (accountChoice)
@@ -39,7 +40,8 @@ int main()
             case 1: projectManager.chooseProject(); break;
             case 2: projectManager.addProject(); break;
             case 3: projectManager.deleteProject();  break;
-            case 4: ui.print("Goodbye!");  break;
+            case 4: accountManager.settings(accountChoice); break;
+            case 5: ui.print("Goodbye!");  break;
             }
         }
     }

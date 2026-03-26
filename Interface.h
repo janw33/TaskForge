@@ -6,10 +6,10 @@ class Interface
 public:
 	void print(const std::string& message);
 	std::string askString(const std::string& prompt);
-	std::string askPassword(const std::string& prompt);
 
 	void printMenu();
 	void printAccountMenu();
+	void printAccountSettings();
 	void printProjectMenu();
 
 	int getChoice(int min, int max);
@@ -20,5 +20,5 @@ public:
 	void pauseClear();
 	void printPauseClear(std::string error);
 
-	std::string inputPassword();
+	std::string inputPassword(const std::string& prompt);
 };

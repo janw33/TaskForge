@@ -1,6 +1,6 @@
 #include <iostream>
 #include <limits>
-#include <conio.h>
+#include <unistd.h>
 #include "Interface.h"
 
 
@@ -17,14 +17,6 @@ std::string Interface::askString(const std::string& prompt)
 
     return input;
 }
-
-std::string Interface::askPassword(const std::string& prompt)
-{
-    std::cout << prompt;
-    return inputPassword();
-}
-
-
 
 void Interface::printMenu()
 {
@@ -46,7 +38,18 @@ void Interface::printAccountMenu()
 	std::cout << "[1] Show Projects \n";
 	std::cout << "[2] Add Project   \n";
 	std::cout << "[3] Delete Project\n";
-	std::cout << "[4] Log Out       \n";
+    std::cout << "[4] Settings      \n";
+	std::cout << "[5] Log Out       \n";
+}
+void Interface::printAccountSettings()
+{
+    std::cout << "===================\n";
+	std::cout << " Account Settings  \n";
+	std::cout << "===================\n";
+	std::cout << "[1] Change Username\n";
+	std::cout << "[2] Change Password\n";
+	std::cout << "[3] Delete Accoount\n";
+	std::cout << "[4] Exit           \n";
 }
 void Interface::printProjectMenu()
 {
@@ -109,37 +112,8 @@ void Interface::printPauseClear(std::string error)
 
 
 
-std::string Interface::inputPassword()
+std::string Interface::inputPassword(const std::string& prompt)
 {
-    std::string password;
-    char c;
-
-    const char ENTER = '\r';
-    const char BACKSPACE = '\b';
-
-    while ((c = _getch()) != ENTER)
-    {
-        if (c == 0 || c == 224)
-        {
-            _getch();
-            continue;
-        }
-
-        if (c == BACKSPACE)
-        {
-            if (!password.empty())
-            {
-                password.pop_back();
-                std::cout << "\b \b";
-            }
-        }
-        else
-        {
-            password += c;
-            std::cout << "*";
-        }
-    }
-
-    std::cout << "\n";
-    return password;
+    char* pwd = getpass(prompt.c_str());
+    return std::string(pwd);
 }
