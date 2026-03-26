@@ -25,10 +25,30 @@ bool AccountManager::isUsernameTaken(const std::string &username)
     }
     return false;
 }
+
+bool AccountManager::wantContinue(std::string &confirmation)
+{
+    std::transform(confirmation.begin(), confirmation.end(), confirmation.begin(), [](unsigned char c) { return std::toupper(c); });
+
+    if (confirmation != "YES")
+    {
+    return false;
+    }
+
+    return true;
+}
 void AccountManager::signUp(bool &logged)
 {
     while (true)
     {
+        std::string confirmation = ui.askString("Do you want to continue: (YES)");
+
+        if(!wantContinue(confirmation))
+        {
+            ui.clearScreen();
+            return;
+        }
+
         std::string username = ui.askString("Enter Username: ");
 
         if (isUsernameTaken(username))
@@ -63,8 +83,9 @@ void AccountManager::signUp(bool &logged)
             continue;
         }
         
+        accounts.emplace_back(std::move(username), std::move(password), nextId);
         currentAccountId = nextId;
-        accounts.emplace_back(std::move(username), std::move(password), nextId++);
+        nextId++;
         logged = true;
         ui.printPauseClear("Sign up Successfully");
         return;
@@ -89,8 +110,16 @@ void AccountManager::logIn(bool& logged)
 {
     while (true)
     {
+        std::string confirmation = ui.askString("Do you want to continue: (YES)");
+
+        if(!wantContinue(confirmation))
+        {
+            ui.clearScreen();
+            return;
+        }
+
         std::string username = ui.askString("Enter Username: ");
-        std::string password = ui.inputPassword("Eneter Password: ");
+        std::string password = ui.inputPassword("Enter Password: ");
 
         if (areCredentialsValid(username, password))
         {
@@ -127,6 +156,14 @@ void AccountManager::changeUsername()
 
     while (true)
     {
+    std::string confirmation = ui.askString("Do you want to continue: (YES)");
+
+        if(!wantContinue(confirmation))
+        {
+        ui.clearScreen();
+        return;
+        }
+
     newUsername = ui.askString("Enter new username: ");
 
         if (isUsernameTaken(newUsername))
@@ -175,7 +212,16 @@ void AccountManager::changePassword()
 
     while(true)
     {
-        newPassword = ui.inputPassword("Enter new password: ");
+
+    std::string confirmation = ui.askString("Do you want to continue: (YES)");
+
+        if(!wantContinue(confirmation))
+        {
+        ui.clearScreen();
+        return;
+        }
+
+    newPassword = ui.inputPassword("Enter new password: ");
 
         auto passwordErrors = UserValidator::isPasswordValid(newPassword);
 
@@ -215,9 +261,9 @@ void AccountManager::deleteAccount(int &accountChoice, int &choice)
         return;
     }
 
-    std::string areYouSure = ui.askString("Do you really want to delete your account: (YES)");
+    std::string confirmation = ui.askString("Do you really want to delete your account: (YES)");
 
-    if(areYouSure!="YES")
+    if(!wantContinue(confirmation))
     {
         ui.clearScreen();
         return;
@@ -227,6 +273,7 @@ void AccountManager::deleteAccount(int &accountChoice, int &choice)
     ui.printPauseClear("Account was deleted successfully");
     choice = 4;
     accountChoice = 5;
+    currentAccountId = -1;
 }
 
 void AccountManager::settings(int &accountChoice)

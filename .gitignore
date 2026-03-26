@@ -1,9 +1,26 @@
-.vs/ 
-*.user 
-*.suo 
-*.exe 
-*.obj 
-*.log 
-Debug/ 
-Release/ 
-x64/ 
+# Build directories
+build/
+cmake-build-*/
+
+# CMake files
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile
+compile_commands.json
+
+# Compiled files
+*.o
+*.obj
+*.out
+*.exe
+
+# MacOS
+.DS_Store
+
+# Logs
+*.log
+
+# IDE (opcjonalnie)
+.vscode/
+.idea/

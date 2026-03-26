@@ -16,6 +16,8 @@ class AccountManager
 	bool isUsernameTaken(const std::string& usernmame);
 	bool areCredentialsValid(const std::string& username, const std::string& password);
 
+	bool wantContinue(std::string &confirmation);
+
 	void changeUsername();
 	void changePassword();
 	void deleteAccount(int &accountChoice, int &choice);
