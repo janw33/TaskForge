@@ -8,12 +8,17 @@ CMakeFiles/
 cmake_install.cmake
 Makefile
 compile_commands.json
+Testing/
 
 # Compiled files
 *.o
 *.obj
 *.out
 *.exe
+*.a
+*.lib
+*.dll
+*.so
 
 # MacOS
 .DS_Store
@@ -21,6 +26,9 @@ compile_commands.json
 # Logs
 *.log
 
-# IDE (opcjonalnie)
+# IDE
 .vscode/
 .idea/
+
+# Misc
+*.swp

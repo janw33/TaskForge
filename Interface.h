@@ -3,15 +3,20 @@
 
 class Interface
 {
-	AccountManager am;
-public:
-//Menu
+	AccountManager &accountManager;
+
 	void printMenu();
+	void signUp(bool &logged);
+	void login(bool &logged);
+
 	void printAccountMenu();
+
 	void printAccountSettings();
-	void printProjectMenu();
-//ui AccountManager 
-	void signUp();
-	void logIn();
-	void accountSettings();
+	void changeUsername();
+	void changePassword();
+	void deleteAccount(int &accountChoice);
+	void accountSettings(int &accountChoice);
+public:
+	Interface(AccountManager& am);
+	void run();
 };
