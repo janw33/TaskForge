@@ -1,10 +1,12 @@
 #pragma once
 #include <string>
+#include <vector>
 class Account
 {
 	std::string username;
 	std::string password;
 	int id;
+
 public:
 	Account(const std::string& username, const std::string& password, int id);
 

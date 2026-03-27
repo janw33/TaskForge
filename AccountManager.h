@@ -1,12 +1,9 @@
 #pragma once
 #include <vector>
 #include "Account.h"
-#include "Interface.h"
-#include "UserValidator.h"
 
 class AccountManager
 {
-	Interface& ui;
 	std::vector<Account>accounts;
 	int currentAccountId;
 	int nextId;

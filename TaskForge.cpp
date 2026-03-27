@@ -1,6 +1,5 @@
 ﻿#include "Interface.h"
 #include "AccountManager.h"
-#include "ProjectManager.h"
 
 int main()
 {
@@ -10,13 +9,12 @@ int main()
 
     while (true)
     {
-        ui.clearScreen();
         bool logged = false;
 
         while (!logged)
         {
             ui.printMenu();
-            int choice = ui.getChoice(1, 3);
+            int choice
             ui.clearScreen();
 
             switch (choice)

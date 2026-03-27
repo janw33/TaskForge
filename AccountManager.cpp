@@ -82,7 +82,7 @@ void AccountManager::signUp(bool &logged)
             ui.pauseClear();
             continue;
         }
-        
+  
         accounts.emplace_back(std::move(username), std::move(password), nextId);
         currentAccountId = nextId;
         nextId++;
