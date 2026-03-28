@@ -9,7 +9,11 @@ class Interface
 	void signUp(bool &logged);
 	void login(bool &logged);
 
+
 	void printAccountMenu();
+	void showProjects();
+	void addProject();
+	void deleteProject();
 
 	void printAccountSettings();
 	void changeUsername();

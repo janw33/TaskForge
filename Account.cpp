@@ -32,3 +32,4 @@ void Account::setPassword(const std::string &newPassword)
 {
     password = newPassword;
 }
+

@@ -81,6 +81,24 @@ void Interface::printAccountMenu()
     std::cout << "[5] Log Out       \n";
 }
 
+void Interface::showProjects()
+{
+
+}
+void Interface::addProject()
+{
+    std::cout << "Enter project name\n";
+    std::string name;
+    std::getline(std::cin, name);
+
+    int index = accountManager.findCurrentAccountIndex();
+    
+}
+void Interface::deleteProject()
+{
+
+}
+
 void Interface::printAccountSettings()
 {
     std::cout << "===================\n";
@@ -180,9 +198,9 @@ void Interface::run() // dodaj walidacje choice
 
             switch(accountChoice)
             {
-            case 1: break;
-            case 2: break;
-            case 3: break;
+            case 1: showProjects(); break;
+            case 2: addProject(); break;
+            case 3: deleteProject(); break;
             case 4: accountSettings(accountChoice); break;
             case 5: accountManager.logout(); std::cout << "Log Out\n"; break;
             }

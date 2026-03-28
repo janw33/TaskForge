@@ -1,20 +1,11 @@
 #include "AccountManager.h"
 
 AccountManager::AccountManager()
-    : nextId(1), currentAccountId(-1)
+    : nextId(1), currentAccount(nullptr)
 {
 }
 
-int AccountManager::findAccountIndexById(int id) {
-    for (size_t i = 0; i < accounts.size(); i++) {
-        if (accounts[i].getId() == id) {
-            return i;
-        }
-    }
-    return -1; 
-}
-
-bool AccountManager::isUsernameTaken(const std::string &username)
+bool AccountManager::isUsernameTaken(const std::string &username) const
 {
     for (const auto& acc : accounts)
     {
@@ -29,7 +20,7 @@ bool AccountManager::isUsernameTaken(const std::string &username)
 void AccountManager::addAccount(const std::string &username, const std::string &password)
 { 
         accounts.emplace_back(username, password, nextId);
-        currentAccountId = nextId;
+        currentAccount = &accounts.back();
         nextId++;
 }
 
@@ -37,42 +28,47 @@ void AccountManager::addAccount(const std::string &username, const std::string &
 
 bool AccountManager::login(const std::string& username, const std::string& password)
 {
-    for (const auto& acc : accounts)
+    for(size_t i = 0; i<accounts.size(); i++)
     {
-        if (acc.getUsername() == username && acc.getPassword() == password)
+        const auto& acc = accounts[i];
+
+        if(acc.getUsername() == username && acc.getPassword() == password)
         {
-            currentAccountId = acc.getId();
+            currentAccount = &accounts[i];
             return true;
         }
     }
+    currentAccount = nullptr;
     return false;
 }
 
 
 void AccountManager::changeUsername(const std::string &newUsername)
 {
-    int index = findAccountIndexById(currentAccountId);
-    if (index == -1) return;
-    auto &acc = accounts[index]; 
-    acc.setUsername(newUsername);
+    if (currentAccount) {
+    currentAccount->setUsername(newUsername);
+    }
 }
 
 void AccountManager::changePassword(const std::string &newPassword)
 {
-    int index = findAccountIndexById(currentAccountId);
-    if (index == -1) return;
-    auto &acc = accounts[index];
-    acc.setPassword(newPassword);
+    if (currentAccount) {
+    currentAccount->setPassword(newPassword);
+    }
 }
 
 void AccountManager::deleteAccount()
 {
-    int index = findAccountIndexById(currentAccountId);
-    if (index == -1) return;
-    accounts.erase(accounts.begin() + index);
-    logout();
-}
+    if(!currentAccount) return;
 
-void AccountManager::logout(){
-    currentAccountId = -1;
+    for(size_t i = 0; i<accounts.size(); i++)
+    {
+        if(&accounts[i] == currentAccount)
+        {
+            accounts.erase(accounts.begin() + i);
+            break;
+        }
+    }
+
+    currentAccount = nullptr;
 }

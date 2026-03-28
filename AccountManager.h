@@ -4,14 +4,16 @@
 class AccountManager
 {
 	std::vector<Account>accounts;
-	int currentAccountId;
+	Account* currentAccount;
 	int nextId;
 
 	int findAccountIndexById(int id);
 public:
 	AccountManager();
 
-	bool isUsernameTaken(const std::string& username);
+	int findCurrentAccountIndex();
+	
+	bool isUsernameTaken(const std::string& username) const;
 
 	void addAccount(const std::string &username, const std::string &password);
 	bool login(const std::string& username, const std::string& password);
@@ -21,4 +23,6 @@ public:
 	void deleteAccount();
 
 	void logout();
+
+	const int getCurrentAccountId() const;
 };
