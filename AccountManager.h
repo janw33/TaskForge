@@ -6,23 +6,25 @@ class AccountManager
 	std::vector<Account>accounts;
 	Account* currentAccount;
 	int nextId;
-
-	int findAccountIndexById(int id);
 public:
 	AccountManager();
 
-	int findCurrentAccountIndex();
-	
+	//log in
 	bool isUsernameTaken(const std::string& username) const;
-
 	void addAccount(const std::string &username, const std::string &password);
+
 	bool login(const std::string& username, const std::string& password);
 
+	//settings
 	void changeUsername(const std::string &newUsername);
 	void changePassword(const std::string &newPassword);
 	void deleteAccount();
 
-	void logout();
+	// projects
+	int findCurrentProjectIndexById(int id) const;
+	void addProjectToCurrent(const std::string &name);
+	void deleteCurrentProject(size_t index);
+	const std::vector<Project>& getCurrentProjects() const;
 
-	const int getCurrentAccountId() const;
+	void logout();
 };

@@ -1,7 +1,7 @@
 #include "Account.h"
 
 Account::Account(const std::string& username, const std::string& password, int id)
-	:username(username), password(password), id(id)
+	:username(username), password(password), id(id), projectNextId(1)
 {
 }
 
@@ -21,7 +21,10 @@ int Account::getId() const
 {
     return id;
 }
-
+const std::vector<Project>& Account::getProjects() const
+{
+    return projects;
+}
 
 
 void Account::setUsername(const std::string &newUsername)
@@ -33,3 +36,24 @@ void Account::setPassword(const std::string &newPassword)
     password = newPassword;
 }
 
+	
+int Account::findProjectIndexById(int id) const
+{
+    for(size_t i = 0; i < projects.size(); i++)
+    {
+        if(id == projects[i].getId())
+        {
+            return i;
+        }
+    }
+    return -1;
+}
+
+void Account::addProject(const std::string &name)
+{
+    projects.emplace_back(name, projectNextId++);
+}
+void Account::deleteProject(size_t index)
+{
+    projects.erase(projects.begin() + index);
+}

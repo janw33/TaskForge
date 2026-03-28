@@ -8,4 +8,5 @@ add_executable(TaskForge
     AccountManager.cpp
     Interface.cpp
     TaskForge.cpp
+    Project.cpp
 )

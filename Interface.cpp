@@ -23,10 +23,11 @@ void Interface::signUp(bool &logged)
         std::cout<<"Enter username: ";
         std::string username;
         std::getline(std::cin, username);
-        std::cout<<'\n';
+
         if(accountManager.isUsernameTaken(username))
         {
             std::cout<<"Username is unavailable\n";
+            accountManager.logout();
             continue;
         }
         //walidacja username
@@ -50,16 +51,15 @@ void Interface::login(bool &logged)
         std::cout<<"Enter username: ";
         std::string username;
         std::getline(std::cin, username);
-        std::cout<<'\n';
 
         std::cout<<"Enter password: ";
         std::string password;
         std::getline(std::cin, password);
-        std::cout<<'\n';
 
         if(!accountManager.login(username, password))
         {
             std::cout << "Credentials are invalid\n";
+            accountManager.logout();
             continue;
         }
 
@@ -81,9 +81,33 @@ void Interface::printAccountMenu()
     std::cout << "[5] Log Out       \n";
 }
 
+void Interface::printProjectList()
+{
+    for(const auto& project : accountManager.getCurrentProjects())
+    {
+        std::cout <<"[" + std::to_string(project.getId()) + "] " + project.getName() + '\n';
+    }
+}
+
 void Interface::showProjects()
 {
+    std::cout << "Enter project id: \n";
 
+    printProjectList();
+
+    std::string idStr;
+    std::getline(std::cin, idStr);
+    int id = stoi(idStr);
+
+    size_t index = accountManager.findCurrentProjectIndexById(id);
+
+    if(index != -1)
+    {
+        //insideProject();
+        return;
+    }
+
+    std::cout << "Invalid id\n";
 }
 void Interface::addProject()
 {
@@ -91,12 +115,30 @@ void Interface::addProject()
     std::string name;
     std::getline(std::cin, name);
 
-    int index = accountManager.findCurrentAccountIndex();
+    accountManager.addProjectToCurrent(name);
+    std::cout << "Project was added successfully\n";
     
 }
 void Interface::deleteProject()
 {
+    std::cout << "Enter project id: \n";
 
+    printProjectList();
+
+    std::string idStr;
+    std::getline(std::cin, idStr);
+    int id = stoi(idStr);
+
+    size_t index = accountManager.findCurrentProjectIndexById(id);
+
+    if(index != -1)
+    {
+        accountManager.deleteCurrentProject(index);
+        std::cout << "Project was deleted successfully\n";
+        return;
+    }
+
+    std::cout << "Invalid id\n";
 }
 
 void Interface::printAccountSettings()
@@ -143,6 +185,7 @@ void Interface::changePassword()
 void Interface::deleteAccount(int &accountChoice)
 {
     accountManager.deleteAccount();
+    accountManager.logout();
     std::cout << "Account was deleted successfully\n";
     accountChoice = 5;
 }

@@ -19,9 +19,8 @@ bool AccountManager::isUsernameTaken(const std::string &username) const
 
 void AccountManager::addAccount(const std::string &username, const std::string &password)
 { 
-        accounts.emplace_back(username, password, nextId);
+        accounts.emplace_back(username, password, nextId++);
         currentAccount = &accounts.back();
-        nextId++;
 }
 
 
@@ -70,5 +69,27 @@ void AccountManager::deleteAccount()
         }
     }
 
+    currentAccount = nullptr;
+}
+
+int AccountManager::findCurrentProjectIndexById(int id) const
+{
+    return currentAccount -> findProjectIndexById(id);
+}
+
+void AccountManager::addProjectToCurrent(const std::string &name)
+{
+    currentAccount -> addProject(name);
+}
+void AccountManager::deleteCurrentProject(size_t index)
+{
+    currentAccount -> deleteProject(index);
+}
+const std::vector<Project>& AccountManager::getCurrentProjects() const
+{
+    return currentAccount -> getProjects();
+}
+void AccountManager::logout()
+{
     currentAccount = nullptr;
 }
