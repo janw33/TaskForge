@@ -4,29 +4,26 @@
 
 class Account
 {
+	private:
 	std::string username;
 	std::string password;
-	int id;
+	std::uint64_t ID;
 	std::vector<Project>projects;
-	Project* currentProject;
-	int projectNextId;
-public:
-	Account(const std::string& username, const std::string& password, int id);
+	std::uint64_t projectNextID;
+	
+	public:
+	Account(const std::string& username, const std::string& password, std::uint64_t ID);
 
 	const std::string& getUsername() const;
 	const std::string& getPassword() const;
-	int getId() const;
+	std::uint64_t getID() const;
 	const std::vector<Project>& getProjects() const;
 
 	void setUsername(const std::string &newUsername);
 	void setPassword(const std::string &newPassword);
-	void setCurrentProject(size_t index);
 
-	int findProjectIndexById(int id) const;
+	Project* findProjectByID(std::uint64_t ID);
+	std::ptrdiff_t findProjectIndexByID(std::uint64_t ID);
 	void addProject(const std::string &name);
 	void deleteProject(size_t index);
-
-	void showCurrentTasks();
-	void addCurrentTask(const std::string& name, int id);
-	void deleteCurrentTask();
 };

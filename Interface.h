@@ -1,10 +1,11 @@
 #pragma once
-#include "AccountManager.h"
-#include "Account.h"
+#include "Storage.h"
+#include "Session.h"
 
 class Interface
 {
-	AccountManager &accountManager;
+	Storage &storage;
+	Session &session;
 
 	void printMenu();
 	void signUp(bool &logged);
@@ -31,6 +32,6 @@ class Interface
 	void deleteAccount(int &accountChoice);
 	void accountSettings(int &accountChoice);
 public:
-	Interface(AccountManager& am);
+	Interface(Storage &st, Session &se);
 	void run();
 };

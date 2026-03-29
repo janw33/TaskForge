@@ -1,8 +1,8 @@
 #include <iostream>
 #include "Interface.h"
 
-Interface::Interface(AccountManager& am)
-    : accountManager(am)
+Interface::Interface(Storage &st, Session &se)
+    : storage(st), session(se)
 {
 }
 
@@ -24,10 +24,10 @@ void Interface::signUp(bool &logged)
         std::string username;
         std::getline(std::cin, username);
 
-        if(accountManager.isUsernameTaken(username))
+        if(storage.isUsernameTaken(username))
         {
             std::cout<<"Username is unavailable\n";
-            accountManager.logout();
+            session.logout();
             continue;
         }
         //walidacja username
@@ -36,10 +36,19 @@ void Interface::signUp(bool &logged)
         std::string password;
         std::getline(std::cin, password);
         std::cout<<'\n';
+
         //walidacja password, hashowanie password
-        accountManager.addAccount(username, password);
+
+        storage.addAccount(username, password);
+
+        Account* acc = storage.findAccountByUsername(username);
+        if(acc) session.setCurrentAccount(acc);
+        else {
+            std::cout << "Fatal Error";
+            return;
+        }
+
         std::cout <<"Signed up successfully\n";
-        logged = true;
         return;
     }
 }
@@ -56,15 +65,21 @@ void Interface::login(bool &logged)
         std::string password;
         std::getline(std::cin, password);
 
-        if(!accountManager.login(username, password))
+        if(!storage.validateCredentials(username, password))
         {
             std::cout << "Credentials are invalid\n";
-            accountManager.logout();
+            session.logout();
             continue;
         }
 
+        Account* acc = storage.findAccountByUsername(username);
+        if(acc) session.setCurrentAccount(acc);
+        else {
+            std::cout << "Fatal Error";
+            return;
+        }
+
         std::cout << "Logged successfully\n";
-        logged = true;
         return;
     }
 }
@@ -83,7 +98,7 @@ void Interface::printAccountMenu()
 
 void Interface::printProjectList()
 {
-    for(const auto& project : accountManager.getCurrentProjects())
+    for(const auto& project : session.getProjects())
     {
         std::cout <<"[" + std::to_string(project.getId()) + "] " + project.getName() + '\n';
     }
@@ -119,6 +134,7 @@ void Interface::insideProject()
     while(true)
     {
         printProjectMenu();
+        
         std::string choiceStr;
         std::getline(std::cin, choiceStr);
         int choice = stoi(choiceStr);
@@ -142,11 +158,11 @@ void Interface::showProjects()
     std::getline(std::cin, idStr);
     int id = stoi(idStr);
 
-    size_t index = accountManager.findCurrentProjectIndexById(id);
+    Project* prj = session.findProjectByID(id);
 
-    if(index != -1)
+    if(prj)
     {
-        accountManager.setCurrentAccountCurrentProject(index);
+        session.setCurrentProject(prj);
         insideProject();
         return;
     }
@@ -159,7 +175,7 @@ void Interface::addProject()
     std::string name;
     std::getline(std::cin, name);
 
-    accountManager.addProjectToCurrent(name);
+    session.addProject(name);
     std::cout << "Project was added successfully\n";
     
 }
@@ -173,11 +189,11 @@ void Interface::deleteProject()
     std::getline(std::cin, idStr);
     int id = stoi(idStr);
 
-    size_t index = accountManager.findCurrentProjectIndexById(id);
+    std::ptrdiff_t index = session.findProjectIndexByID(id);
 
     if(index != -1)
     {
-        accountManager.deleteCurrentProject(index);
+        session.deleteProject(index);
         std::cout << "Project was deleted successfully\n";
         return;
     }
@@ -204,13 +220,13 @@ void Interface::changeUsername()
         std::string newUsername;
         std::getline(std::cin, newUsername);
 
-        if(accountManager.isUsernameTaken(newUsername))
+        if(storage.isUsernameTaken(newUsername))
         {
         std::cout<<"Username is unavailable\n";
         continue;
         }
 
-        accountManager.changeUsername(newUsername);
+        session.changeUsername(newUsername);
         std::cout << "Username was changed successfully\n";
         return;
     }
@@ -222,14 +238,20 @@ void Interface::changePassword()
     std::string newPassword;
     std::getline(std::cin, newPassword);
 
-    accountManager.changePassword(newPassword);
+    session.changePassword(newPassword);
     std::cout << "Password was changed successfully\n";
 }
 
 void Interface::deleteAccount(int &accountChoice)
 {
-    accountManager.deleteAccount();
-    accountManager.logout();
+    std::ptrdiff_t index = storage.findAccountIndexByUsername(session.getUsername());
+    if(index == -1)
+    {
+        std::cout << "Fatal error\n";
+        return;
+    }
+    storage.deleteAccount(index);
+    session.logout();
     std::cout << "Account was deleted successfully\n";
     accountChoice = 5;
 }
@@ -289,7 +311,7 @@ void Interface::run() // dodaj walidacje choice
             case 2: addProject(); break;
             case 3: deleteProject(); break;
             case 4: accountSettings(accountChoice); break;
-            case 5: accountManager.logout(); std::cout << "Log Out\n"; break;
+            case 5: session.logout(); std::cout << "Log Out\n"; break;
             }
         }
     }

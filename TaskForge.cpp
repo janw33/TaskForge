@@ -1,11 +1,11 @@
-﻿#include "Interface.h"
-#include "AccountManager.h"
-#include "Account.h"
-
+﻿#include "Storage.h"
+#include "Session.h"
+#include "Interface.h"
 int main()
 {
-    AccountManager accountManager;
-    Interface ui(accountManager);
+    Storage storage;
+    Session session;
+    Interface ui(storage, session);
 
     ui.run();
     
