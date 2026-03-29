@@ -6,6 +6,7 @@ class Project
 {
 	std::string name;
 	int id;
+	std::vector<Task>tasks;
 
 public:
 	Project(const std::string& name, int id);
@@ -14,6 +15,6 @@ public:
 	int getId() const;
 
 	void showTasks();
-	void addTask();
+	void addTask(const std::string& name, int id);
 	void deleteTask();
 };

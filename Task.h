@@ -11,10 +11,9 @@ class Task
 
 	bool isDone;
 public:
-	Task(const std::string& name, int id);
+	Task(const std::string& name, int id, bool isDonce);
 
 	const std::string &getName() const;
-	const std::string &getPriority() const;
 	int getId() const;
 	bool getIsDone() const;
 };

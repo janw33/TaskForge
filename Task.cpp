@@ -1,7 +1,7 @@
 #include "Task.h"
 
-Task::Task(const std::string& name, const std::string& priority, int id)
-    : name(name), priority(priority), id(id), isDone(false)
+Task::Task(const std::string& name, int id, bool isDone)
+    : name(name),  id(id), isDone(isDone)
 {
 }
 
@@ -12,10 +12,6 @@ const std::string &Task::getName() const
     return name;
 }
 
-const std::string &Task::getPriority() const
-{
-    return priority;
-}
 
 int Task::getId() const
 {

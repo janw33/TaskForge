@@ -104,6 +104,10 @@ void Interface::showTasks()
 }
 void Interface::addTask()
 {
+    std::cout << "Enter name: ";
+    std::string name;
+    std::getline(std::cin, name);
+
     
 }
 void Interface::deleteTask()

@@ -16,3 +16,15 @@ int Project::getId() const
     return id;
 }
 
+void Project::showTasks()
+{
+
+}
+void Project::addTask(const std::string& name, int id)
+{
+    tasks.emplace_back(name, id, false);
+}
+void Project::deleteTask()
+{
+
+}

@@ -25,4 +25,8 @@ public:
 	int findProjectIndexById(int id) const;
 	void addProject(const std::string &name);
 	void deleteProject(size_t index);
+
+	void showCurrentTasks();
+	void addCurrentTask(const std::string& name, int id);
+	void deleteCurrentTask();
 };

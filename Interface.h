@@ -1,5 +1,6 @@
 #pragma once
 #include "AccountManager.h"
+#include "Account.h"
 
 class Interface
 {

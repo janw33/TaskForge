@@ -60,3 +60,18 @@ void Account::deleteProject(size_t index)
 {
     projects.erase(projects.begin() + index);
 }
+
+
+
+void Account::showCurrentTasks()
+{
+
+}
+void Account::addCurrentTask(const std::string& name, int id)
+{
+    currentProject -> addTask(name, id);
+}
+void Account::deleteCurrentTask()
+{
+
+}
