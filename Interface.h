@@ -11,8 +11,16 @@ class Interface
 
 
 	void printAccountMenu();
+
 	void printProjectList();
+
+	void printProjectMenu();
+	void showTasks();
+	void addTask();
+	void deleteTask();
+	void insideProject();
 	void showProjects();
+
 	void addProject();
 	void deleteProject();
 

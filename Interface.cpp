@@ -88,7 +88,46 @@ void Interface::printProjectList()
         std::cout <<"[" + std::to_string(project.getId()) + "] " + project.getName() + '\n';
     }
 }
+void Interface::printProjectMenu()
+{
+    std::cout << "================= \n";
+    std::cout << "  Project Menu    \n";
+    std::cout << "================= \n";
+    std::cout << "[1] Show Tasks    \n";
+    std::cout << "[2] Add Task      \n";
+    std::cout << "[3] Delete Task   \n";
+    std::cout << "[4] Log Out       \n";
+}
+void Interface::showTasks()
+{
 
+}
+void Interface::addTask()
+{
+    
+}
+void Interface::deleteTask()
+{
+
+}
+void Interface::insideProject()
+{
+    while(true)
+    {
+        printProjectMenu();
+        std::string choiceStr;
+        std::getline(std::cin, choiceStr);
+        int choice = stoi(choiceStr);
+
+        switch(choice)
+        {
+            case 1:
+            case 2:
+            case 3: 
+            case 4: std::cout << "Goodbye\n"; return;
+        }
+    }
+}
 void Interface::showProjects()
 {
     std::cout << "Enter project id: \n";
@@ -103,7 +142,8 @@ void Interface::showProjects()
 
     if(index != -1)
     {
-        //insideProject();
+        accountManager.setCurrentAccountCurrentProject(index);
+        insideProject();
         return;
     }
 

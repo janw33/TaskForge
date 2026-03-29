@@ -1,7 +1,7 @@
 #include "Account.h"
 
 Account::Account(const std::string& username, const std::string& password, int id)
-	:username(username), password(password), id(id), projectNextId(1)
+	:username(username), password(password), id(id), projectNextId(1), currentProject(nullptr)
 {
 }
 
@@ -35,7 +35,10 @@ void Account::setPassword(const std::string &newPassword)
 {
     password = newPassword;
 }
-
+void Account::setCurrentProject(size_t index)
+{
+    currentProject = &projects[index];
+}
 	
 int Account::findProjectIndexById(int id) const
 {

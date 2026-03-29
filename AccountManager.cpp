@@ -76,7 +76,10 @@ int AccountManager::findCurrentProjectIndexById(int id) const
 {
     return currentAccount -> findProjectIndexById(id);
 }
-
+void AccountManager::setCurrentAccountCurrentProject(size_t index)
+{
+    currentAccount -> setCurrentProject(index);
+}
 void AccountManager::addProjectToCurrent(const std::string &name)
 {
     currentAccount -> addProject(name);

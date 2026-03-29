@@ -22,6 +22,7 @@ public:
 
 	// projects
 	int findCurrentProjectIndexById(int id) const;
+	void setCurrentAccountCurrentProject(size_t index);
 	void addProjectToCurrent(const std::string &name);
 	void deleteCurrentProject(size_t index);
 	const std::vector<Project>& getCurrentProjects() const;

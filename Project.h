@@ -1,6 +1,6 @@
 #pragma once
 #include <vector>
-
+#include "Task.h"
 
 class Project
 {
@@ -12,4 +12,8 @@ public:
 
 	const std::string& getName() const;
 	int getId() const;
+
+	void showTasks();
+	void addTask();
+	void deleteTask();
 };
