@@ -41,7 +41,7 @@ Project* Account::findProjectByID(std::uint64_t ID)
 {
     for(size_t i = 0; i < projects.size(); i++)
     {
-        if(ID == projects[i].getId()) return &projects[i];
+        if(ID == projects[i].getID()) return &projects[i];
     }
     return nullptr;
 }
@@ -49,7 +49,7 @@ std::ptrdiff_t Account::findProjectIndexByID(std::uint64_t ID)
 {
     for(size_t i = 0; i < projects.size(); i++)
     {
-        if(ID == projects[i].getId()) return i;
+        if(ID == projects[i].getID()) return i;
     }
     return -1;
 }

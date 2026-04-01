@@ -8,8 +8,8 @@ class Interface
 	Session &session;
 
 	void printMenu();
-	void signUp(bool &logged);
-	void login(bool &logged);
+	void signUp();
+	void login();
 
 
 	void printAccountMenu();
@@ -17,6 +17,9 @@ class Interface
 	void printProjectList();
 
 	void printProjectMenu();
+	void printTaskList();
+	void printTaskMenu();
+	void insideTask();
 	void showTasks();
 	void addTask();
 	void deleteTask();
@@ -29,8 +32,10 @@ class Interface
 	void printAccountSettings();
 	void changeUsername();
 	void changePassword();
-	void deleteAccount(int &accountChoice);
-	void accountSettings(int &accountChoice);
+	bool deleteAccount();
+	bool accountSettings();
+
+	void accountMenu();
 public:
 	Interface(Storage &st, Session &se);
 	void run();

@@ -1,7 +1,7 @@
 #include "Task.h"
 
-Task::Task(const std::string& name, int id, bool isDone)
-    : name(name),  id(id), isDone(isDone)
+Task::Task(const std::string& name, std::uint64_t ID)
+    : name(name),  ID(ID), isDone(false)
 {
 }
 
@@ -13,12 +13,17 @@ const std::string &Task::getName() const
 }
 
 
-int Task::getId() const
+std::uint64_t Task::getID() const
 {
-    return id;
+    return ID;
 }
 
 bool Task::getIsDone() const
 {
     return isDone;
+}
+
+void Task::changeStatus(){
+    if(isDone == true) isDone = false;
+    else isDone = true;
 }

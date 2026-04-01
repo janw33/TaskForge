@@ -5,8 +5,10 @@ set(CMAKE_CXX_STANDARD 17)
 
 add_executable(TaskForge
     Account.cpp
-    AccountManager.cpp
     Interface.cpp
     TaskForge.cpp
     Project.cpp
+    Storage.cpp
+    Session.cpp
+    Task.cpp
 )

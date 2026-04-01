@@ -9,7 +9,7 @@ class Storage
 
     public:
     Storage();
-    Account* findAccountByUsername(const std::string &username);
+    Account* findAccountByUsername(const std::string &username); 
     std::ptrdiff_t findAccountIndexByUsername(const std::string &username);
     
     bool isUsernameTaken(const std::string &username);
