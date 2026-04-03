@@ -7,14 +7,16 @@ class Storage
     std::vector<Account>accounts;
     std::uint64_t nextID;
 
+    std::ptrdiff_t findAccountIndexByID(std::uint64_t ID);
+
     public:
     Storage();
+
     Account* findAccountByUsername(const std::string &username); 
-    std::ptrdiff_t findAccountIndexByUsername(const std::string &username);
     
     bool isUsernameTaken(const std::string &username);
     bool validateCredentials(const std::string &usenrame, const std::string &password);
 
     void addAccount(const std::string &username,const std::string &password);
-    void deleteAccount(size_t index);
+    bool deleteAccount(std::uint64_t ID);
 };

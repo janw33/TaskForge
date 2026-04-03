@@ -4,53 +4,49 @@ Storage::Storage()
     :nextID(1)
 {
 }
+
+
+
 Account* Storage::findAccountByUsername(const std::string &username) {
     for(size_t i = 0; i < accounts.size(); i++) 
-    {
-        const auto& acc = accounts[i];
+        if(accounts[i].getUsername() == username) return &accounts[i];
 
-        if(acc.getUsername() == username) return &accounts[i];
-    }
     return nullptr;
 }
-std::ptrdiff_t Storage::findAccountIndexByUsername(const std::string &username) {
-    for(size_t i = 0; i < accounts.size(); i++) 
-    {
-        const auto& acc = accounts[i];
 
-        if(acc.getUsername() == username) return i;
-    }
-    return -1;
-}
-bool Storage::isUsernameTaken(const std::string &username)
-{
+
+
+bool Storage::isUsernameTaken(const std::string &username) {
     for (const auto& acc : accounts)
-    {
-        if (acc.getUsername() == username)
-        {
-            return true;
-        }
-    }
+        if (acc.getUsername() == username) return true;
+
     return false;
 }
-bool Storage::validateCredentials(const std::string &username, const std::string &password)
-{
+bool Storage::validateCredentials(const std::string &username, const std::string &password) {
     for(const auto& acc : accounts)
-    {
-        if(acc.getUsername() == username && acc.getPassword() == password)
-        {
-            return true;
-        }
-    }
+        if(acc.getUsername() == username && acc.getPassword() == password) return true;
     
     return false;
 }
 
-void Storage::addAccount(const std::string &username,const std::string& password)
-{
+
+
+void Storage::addAccount(const std::string &username,const std::string& password) {
     accounts.emplace_back(username, password, nextID++);
 }
-void Storage::deleteAccount(size_t index)
-{
+
+
+
+std::ptrdiff_t Storage::findAccountIndexByID(std::uint64_t ID) {
+    for(size_t i = 0; i < accounts.size(); i++) 
+        if(accounts[i].getID() == ID) return i;
+
+    return -1;
+}
+bool Storage::deleteAccount(std::uint64_t ID) {
+    std::ptrdiff_t index = findAccountIndexByID(ID);
+    if(index == -1) return false;
+
     accounts.erase(accounts.begin() + index);
+    return true;
 }

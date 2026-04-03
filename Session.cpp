@@ -5,20 +5,31 @@ Session::Session()
 {
 }
 
+
+
+bool Session::isAccountOpened() {
+    return currentAccount;
+}
+bool Session::isProjectOpened() {
+    return currentProject;
+}
+bool Session::isTaskOpened() {
+    return currentTask;
+}
+
+
+
 void Session::changeUsername(const std::string &newUsername) {
-    if (currentAccount) {
     currentAccount->setUsername(newUsername);
-    }
 }
 void Session::changePassword(const std::string &newPassword) {
-    if (currentAccount) {
     currentAccount->setPassword(newPassword);
-    }
 }
 
 
-const std::string &Session::getUsername() const{
-    return currentAccount -> getUsername();
+
+std::uint64_t Session::getAccountID() const {
+    return currentAccount -> getID();
 }
 const std::vector<Project> &Session::getProjects() const {
     return currentAccount -> getProjects();
@@ -32,17 +43,23 @@ const std::vector<Task> &Session::getTasks() const{
 Project* Session::findProjectByID (std::uint64_t ID) {
     return currentAccount -> findProjectByID(ID);
 }
-std::ptrdiff_t Session::findProjectIndexByID(std::uint64_t ID) {
-    return currentAccount -> findProjectIndexByID(ID);
-}
+
 
 
 
 void Session::addProject(const std::string &name) {
     currentAccount -> addProject(name);
 }
-void Session::deleteProject(size_t index) {
+
+std::ptrdiff_t Session::findProjectIndexByID(std::uint64_t ID) {
+    return currentAccount -> findProjectIndexByID(ID);
+}
+bool Session::deleteProject(std::uint64_t ID) {
+    std::ptrdiff_t index = findProjectIndexByID(ID);
+    if(index == -1) return false;
+
     currentAccount -> deleteProject(index);
+    return true;
 }
 
 
@@ -50,24 +67,32 @@ void Session::deleteProject(size_t index) {
 Task* Session::findTaskByID(std::uint64_t ID){
     return currentProject -> findTaskByID(ID);
 }
-std::ptrdiff_t Session::findTaskIndexByID(std::uint64_t ID){
-    return currentProject -> findTaskIndexByID(ID);
-}
 
 
 
 void Session::addTask(const std::string &name){
     currentProject -> addTask(name);
 }
-void Session::deleteTask(size_t index) {
-    currentProject -> deleteTask(index);
+
+std::ptrdiff_t Session::findTaskIndexByID(std::uint64_t ID){
+    return currentProject -> findTaskIndexByID(ID);
 }
+bool Session::deleteTask(std::uint64_t ID) {
+    std::ptrdiff_t index = findTaskIndexByID(ID);
+    if(index == -1) return false;
+
+    currentProject -> deleteTask(index);
+    return true;
+}
+
 void Session::changeTaskStatus(){
     currentTask -> changeStatus();
 }
 bool Session::getIsDone() const{
     return currentTask -> getIsDone();
 }
+
+
 
 void Session::setCurrentAccount(Account* acc) {
     currentAccount = acc;
@@ -81,12 +106,20 @@ void Session::setCurrentTask(Task* tsk){
 
 
 
-bool Session::isLogged()
-{
+bool Session::isLogged() {
     return currentAccount != nullptr;
 }
-void Session::logout()
-{
+
+
+
+void Session::logout() {
     currentAccount = nullptr;
     currentProject = nullptr;
+    currentTask = nullptr;
+}
+void Session::exitProject() {
+    currentProject = nullptr;
+}
+void Session::exitTask() {
+    currentTask = nullptr;
 }
