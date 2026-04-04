@@ -37,7 +37,9 @@ const std::vector<Project> &Session::getProjects() const {
 const std::vector<Task> &Session::getTasks() const{
     return currentProject -> getTasks();
 }
-
+const std::vector<std::uint64_t> &Session::getFriendsIDs() const {
+    return currentAccount -> getFriendsIDs();
+}
 
 
 Project* Session::findProjectByID (std::uint64_t ID) {
@@ -109,7 +111,9 @@ void Session::setCurrentTask(Task* tsk){
 bool Session::isLogged() {
     return currentAccount != nullptr;
 }
-
+bool Session::isHeMyFriend(std::uint64_t ID){
+    return currentAccount -> isHeMyFriend(ID);
+}
 
 
 void Session::logout() {

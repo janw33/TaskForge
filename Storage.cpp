@@ -6,7 +6,12 @@ Storage::Storage()
 }
 
 
+Account* Storage::findAccountByID(std::uint64_t ID) {
+    for(size_t i = 0; i < accounts.size(); i++) 
+        if(accounts[i].getID() == ID) return &accounts[i];
 
+    return nullptr;
+}
 Account* Storage::findAccountByUsername(const std::string &username) {
     for(size_t i = 0; i < accounts.size(); i++) 
         if(accounts[i].getUsername() == username) return &accounts[i];
@@ -49,4 +54,34 @@ bool Storage::deleteAccount(std::uint64_t ID) {
 
     accounts.erase(accounts.begin() + index);
     return true;
+}
+
+
+
+bool Storage::addFriend(std::uint64_t ID, std::uint64_t ID2){
+    Account* a = findAccountByID(ID);
+    Account* b = findAccountByID(ID2);
+
+    if(!a || !b) return false;
+    if(ID == ID2) return false;
+
+    a -> addFriend(ID2);
+    b -> addFriend(ID);
+    return true;
+}
+bool Storage::deleteFriend(std::uint64_t ID, std::uint64_t ID2){
+    Account* a = findAccountByID(ID);
+    Account* b = findAccountByID(ID2);
+
+    if(!a || !b) return false;
+    if(ID == ID2) return false;
+
+    if(!a -> deleteFriend(ID2)) return false;
+    if(!b -> deleteFriend(ID)) return false;
+
+    return true;
+}
+
+const std::vector<Account> &Storage::getAccounts() const {
+    return accounts;
 }

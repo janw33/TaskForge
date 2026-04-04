@@ -12,19 +12,21 @@ class Session
 
     std::ptrdiff_t findProjectIndexByID(std::uint64_t ID);
     std::ptrdiff_t findTaskIndexByID(std::uint64_t ID);
+    std::ptrdiff_t findFriendIndexByID(std::uint64_t ID);
     public:
     Session();
 
     bool isAccountOpened();
     bool isProjectOpened();
     bool isTaskOpened();
-    
+
     void changeUsername(const std::string& newUsername);
     void changePassword(const std::string& newPassword);
 
     std::uint64_t getAccountID() const;
     const std::vector<Project> &getProjects() const;
     const std::vector<Task> &getTasks() const;
+    const std::vector<std::uint64_t> &getFriendsIDs() const;
 
     Project* findProjectByID(std::uint64_t ID);
 
@@ -42,6 +44,7 @@ class Session
     void setCurrentProject(Project* prj);
     void setCurrentTask(Task* tsk);
 
+    bool isHeMyFriend(std::uint64_t ID);
     bool isLogged();
 
     void logout();
