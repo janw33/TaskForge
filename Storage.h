@@ -12,15 +12,15 @@ class Storage
     Storage();
 
     Account* findAccountByID(std::uint64_t ID);
-    Account* findAccountByUsername(const std::string &username); 
     
     bool isUsernameTaken(const std::string &username);
-    bool validateCredentials(const std::string &usenrame, const std::string &password);
+    Account* logIn(const std::string &usenrame, const std::string &password);
 
-    void addAccount(const std::string &username,const std::string &password);
+    Account* signUp(const std::string &username,const std::string &password);
     bool deleteAccount(std::uint64_t ID);
 
     bool addFriend(std::uint64_t ID, std::uint64_t ID2);
     bool deleteFriend(std::uint64_t ID, std::uint64_t ID2);
+
     const std::vector<Account> &getAccounts() const;
 };

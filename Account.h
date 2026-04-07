@@ -12,6 +12,9 @@ class Account
 	std::uint64_t projectNextID;
 	std::vector<std::uint64_t>friendsIDs;
 
+	std::ptrdiff_t findProjectIndexByID(std::uint64_t ID);
+	std::ptrdiff_t findFriendIndexByID(std::uint64_t ID);
+
 	public:
 	Account(const std::string& username, const std::string& password, std::uint64_t ID);
 
@@ -25,11 +28,9 @@ class Account
 	void setPassword(const std::string &newPassword);
 
 	Project* findProjectByID(std::uint64_t ID);
-	std::ptrdiff_t findProjectIndexByID(std::uint64_t ID);
-	void addProject(const std::string &name);
-	void deleteProject(size_t index);
+	void addProject(const std::string &name, std::uint64_t ownerID, const std::string& ownerUsername);
+	bool deleteProject(std::uint64_t ID);
 
-	std::ptrdiff_t findFriendIndexByID(std::uint64_t ID);
 	void addFriend(std::uint64_t ID);
 	bool deleteFriend(std::uint64_t ID);
 	bool isHeMyFriend(std::uint64_t ID);

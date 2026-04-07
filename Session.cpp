@@ -31,6 +31,9 @@ void Session::changePassword(const std::string &newPassword) {
 std::uint64_t Session::getAccountID() const {
     return currentAccount -> getID();
 }
+const std::string &Session::getAccountUsername() const {
+    return currentAccount -> getUsername();
+}
 const std::vector<Project> &Session::getProjects() const {
     return currentAccount -> getProjects();
 }
@@ -40,6 +43,10 @@ const std::vector<Task> &Session::getTasks() const{
 const std::vector<std::uint64_t> &Session::getFriendsIDs() const {
     return currentAccount -> getFriendsIDs();
 }
+const std::vector<ProjectMember> &Session::getProjectMembers() const {
+    return currentProject -> getProjectMembers();
+}
+
 
 
 Project* Session::findProjectByID (std::uint64_t ID) {
@@ -50,21 +57,25 @@ Project* Session::findProjectByID (std::uint64_t ID) {
 
 
 void Session::addProject(const std::string &name) {
-    currentAccount -> addProject(name);
+    currentAccount -> addProject(name, getAccountID(), getAccountUsername());
 }
 
-std::ptrdiff_t Session::findProjectIndexByID(std::uint64_t ID) {
-    return currentAccount -> findProjectIndexByID(ID);
-}
+
 bool Session::deleteProject(std::uint64_t ID) {
-    std::ptrdiff_t index = findProjectIndexByID(ID);
-    if(index == -1) return false;
-
-    currentAccount -> deleteProject(index);
-    return true;
+    if(currentAccount -> deleteProject(ID)) return true;
+        else return false;
 }
 
 
+ProjectMember* Session::findMemberByID(std::uint64_t ID) {
+    return currentProject -> findMemberByID(ID);
+}
+void Session::addMember(std::uint64_t ID,const std::string& username, Role role) {
+    currentProject -> addMember(ID, username, role);
+}
+bool Session::deleteMember(std::uint64_t ID) {
+    return currentProject -> deleteMember(ID);
+}
 
 Task* Session::findTaskByID(std::uint64_t ID){
     return currentProject -> findTaskByID(ID);
@@ -76,15 +87,11 @@ void Session::addTask(const std::string &name){
     currentProject -> addTask(name);
 }
 
-std::ptrdiff_t Session::findTaskIndexByID(std::uint64_t ID){
-    return currentProject -> findTaskIndexByID(ID);
-}
-bool Session::deleteTask(std::uint64_t ID) {
-    std::ptrdiff_t index = findTaskIndexByID(ID);
-    if(index == -1) return false;
 
-    currentProject -> deleteTask(index);
-    return true;
+
+bool Session::deleteTask(std::uint64_t ID) {
+    if(currentProject -> deleteTask(ID)) return true;
+        else return false;
 }
 
 void Session::changeTaskStatus(){

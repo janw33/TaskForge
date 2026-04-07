@@ -19,7 +19,7 @@ class Interface
 	void printAccountMenu();
 	
 	//show friend
-	void printAccountsList();
+	void printAvailableAccountsList();
 	void printFriendsList();
 	void showFriends();
 
@@ -31,7 +31,7 @@ class Interface
 
 	//show projects
 	void printProjectList();
-	void insideProject();
+	void insideOwnerProject();
 	void showProjects();
 
 	//add project
@@ -50,6 +50,7 @@ class Interface
 //=========PROJECT===================
 	void printProjectMenu();
 
+//---------Tasks---------------------
 	//show tasks
 	void printTaskList();
 	void insideTask();
@@ -60,6 +61,20 @@ class Interface
 	
 	//delete task
 	void deleteTask();
+
+//---------Users---------------------
+	//show users
+	bool alreadyInProject(std::uint64_t ID);
+	bool printAvailableUsersList();
+	bool printProjectMembers();
+
+	//add user 
+	void printAvailalbleUsersList();
+	void addUser();
+
+	//deleteUser
+	void deleteUser();
+	
 //========TASK=======================
 	void printTaskMenu();
 

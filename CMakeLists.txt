@@ -11,4 +11,5 @@ add_executable(TaskForge
     Storage.cpp
     Session.cpp
     Task.cpp
+    ProjectMember.cpp
 )

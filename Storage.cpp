@@ -12,12 +12,6 @@ Account* Storage::findAccountByID(std::uint64_t ID) {
 
     return nullptr;
 }
-Account* Storage::findAccountByUsername(const std::string &username) {
-    for(size_t i = 0; i < accounts.size(); i++) 
-        if(accounts[i].getUsername() == username) return &accounts[i];
-
-    return nullptr;
-}
 
 
 
@@ -27,17 +21,19 @@ bool Storage::isUsernameTaken(const std::string &username) {
 
     return false;
 }
-bool Storage::validateCredentials(const std::string &username, const std::string &password) {
-    for(const auto& acc : accounts)
-        if(acc.getUsername() == username && acc.getPassword() == password) return true;
-    
-    return false;
+Account* Storage::logIn(const std::string &username, const std::string &password) {
+    for(size_t i = 0; i < accounts.size(); i++) {
+        if(accounts[i].getUsername() == username && accounts[i].getPassword() == password) return &accounts[i];
+    }
+
+    return nullptr;
 }
 
 
 
-void Storage::addAccount(const std::string &username,const std::string& password) {
+Account* Storage::signUp(const std::string &username,const std::string& password) {
     accounts.emplace_back(username, password, nextID++);
+    return &accounts.back();
 }
 
 

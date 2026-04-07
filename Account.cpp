@@ -56,13 +56,17 @@ std::ptrdiff_t Account::findProjectIndexByID(std::uint64_t ID)
     return -1;
 }
 
-void Account::addProject(const std::string &name)
+void Account::addProject(const std::string &name, std::uint64_t ownerID, const std::string &ownerUsername)
 {
-    projects.emplace_back(name, projectNextID++);
+    projects.emplace_back(name, projectNextID++, ownerID, ownerUsername);
 }
-void Account::deleteProject(size_t index)
+bool Account::deleteProject(std::uint64_t ID)
 {
+    std::ptrdiff_t index = findProjectIndexByID(ID);
+    if(index == -1) return false;
+
     projects.erase(projects.begin() + index);
+    return true;
 }
 
 
