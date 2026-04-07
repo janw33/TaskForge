@@ -23,6 +23,7 @@ class Session
     std::uint64_t getAccountID() const;
     const std::string &getAccountUsername() const;
     const std::vector<Project> &getProjects() const;
+    const std::string &getProjectName() const;
     const std::vector<Task> &getTasks() const;
     const std::vector<std::uint64_t> &getFriendsIDs() const;
     const std::vector<ProjectMember> &getProjectMembers() const;

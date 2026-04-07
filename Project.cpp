@@ -1,9 +1,9 @@
 #include "Project.h"
 
-Project::Project(const std::string &name, std::uint64_t ID, std::uint64_t ownerID, const std::string &ownerUsername)
+Project::Project(const std::string &name, std::uint64_t ID, std::uint64_t userID, const std::string &Username, Role role)
     : name(name), ID(ID), taskNextID(1)
 {
-    members.emplace_back(ownerID,ownerUsername, Role::OWNER);
+    members.emplace_back(userID,Username, role);
 }
 
 

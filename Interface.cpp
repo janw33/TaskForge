@@ -195,7 +195,7 @@ void Interface::deleteFriend(){
     std::cout << "Friend deleted successfully\n";
 }
 
-void Interface::printProjectMenu()
+void Interface::printOwnerProjectMenu()
 {
     std::cout << "================= \n";
     std::cout << "  Project Menu    \n";
@@ -217,6 +217,67 @@ void Interface::printProjectList()
 
     for(const auto& project : session.getProjects()) std::cout <<"[" + std::to_string(project.getID()) + "] " + project.getName() + '\n';
 }
+void Interface::printUserProjectMenu() {
+    std::cout << "================= \n";
+    std::cout << "   Project Menu   \n";
+    std::cout << "================= \n";
+    std::cout << "[1] Show Tasks    \n";
+    std::cout << "[2] Show Users    \n";
+    std::cout << "[3] Exit          \n";
+}
+void Interface::insideUserProject() {
+    if(!session.isProjectOpened()) {
+        std::cout << "Error\n" ;
+        return;
+    }
+
+    while(true) {
+        printUserProjectMenu();
+
+        std::string choiceStr;
+        std::getline(std::cin, choiceStr);
+        int choice = stoi(choiceStr);
+
+        switch(choice) {
+            case 1: showTasks(); break;
+            case 2: printProjectMembers(); break;
+            case 3: std::cout << "Goodbye"; session.exitProject(); return;
+        }
+    }
+}
+void Interface::printAdminProjectMenu() {
+    std::cout << "================= \n";
+    std::cout << "  Project Menu    \n";
+    std::cout << "================= \n";
+    std::cout << "[1] Show Tasks    \n";
+    std::cout << "[2] Add Task      \n";
+    std::cout << "[3] Delete Task   \n";
+    std::cout << "[4] Show Users   \n";
+    std::cout << "[5] Exit          \n";
+}
+void Interface::insideAdminProject() {
+       if(!session.isProjectOpened()) {
+        std::cout << "Error\n" ;
+        return;
+    }
+
+    while(true) {
+        printAdminProjectMenu();
+
+        std::string choiceStr;
+        std::getline(std::cin, choiceStr);
+        int choice = stoi(choiceStr);
+
+        switch(choice) {
+            case 1: showTasks(); break;
+            case 2: addTask(); break;
+            case 3: deleteTask(); break;
+            case 4: printProjectMembers(); break;
+            case 5: std::cout << "Goodbye\n"; session.exitProject(); return;
+        }
+    }
+}
+
 void Interface::insideOwnerProject()
 {
     if(!session.isProjectOpened()) {
@@ -226,7 +287,7 @@ void Interface::insideOwnerProject()
 
     while(true)
     {
-        printProjectMenu();
+        printOwnerProjectMenu();
         
         std::string choiceStr;
         std::getline(std::cin, choiceStr);
@@ -283,8 +344,8 @@ void Interface::showProjects()
     }
 
     switch(member -> getRole()) {
-        case Role::USER :
-        case Role::ADMIN :
+        case Role::USER : insideUserProject(); break;
+        case Role::ADMIN : insideAdminProject(); break;
         case Role::OWNER : insideOwnerProject(); break;
     }
     
@@ -334,7 +395,6 @@ bool Interface::alreadyInProject(std::uint64_t ID) {
      for(const auto& member : session.getProjectMembers()){
         if (ID == member.getID()) {
             return true;
-            break;
         }
     }
     return false;
@@ -402,9 +462,14 @@ void Interface::addUser() {
     std::getline(std::cin, input);
     std::transform(input.begin(), input.end(), input.begin() , ::toupper);
 
-    if(input == "USER") session.addMember(acc->getID(), acc->getUsername(), Role::USER);
-    else if(input == "ADMIN") session.addMember(acc->getID(), acc->getUsername(), Role::ADMIN);
-    else { std::cout<<"Invalid Input"; return; }
+    if(input == "USER") {
+        storage.addProject(friendID, session.getProjectName(), Role::USER); 
+        session.addMember(friendID, acc->getUsername(), Role::USER); }
+    else if(input == "ADMIN") {
+            storage.addProject(friendID, session.getProjectName(), Role::ADMIN);
+            session.addMember(friendID, acc->getUsername(), Role::ADMIN); } 
+    else {
+         std::cout<<"Invalid Input"; return; }
 
     std::cout<<"User added successfully\n";
 }   

@@ -56,9 +56,9 @@ std::ptrdiff_t Account::findProjectIndexByID(std::uint64_t ID)
     return -1;
 }
 
-void Account::addProject(const std::string &name, std::uint64_t ownerID, const std::string &ownerUsername)
+void Account::addProject(const std::string &name, std::uint64_t userID, const std::string &Username, Role role)
 {
-    projects.emplace_back(name, projectNextID++, ownerID, ownerUsername);
+    projects.emplace_back(name, projectNextID++, userID, Username, role);
 }
 bool Account::deleteProject(std::uint64_t ID)
 {

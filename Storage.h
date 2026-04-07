@@ -1,6 +1,7 @@
 #pragma once
 #include "Account.h"
 
+
 class Storage
 {  
     private:
@@ -22,5 +23,6 @@ class Storage
     bool addFriend(std::uint64_t ID, std::uint64_t ID2);
     bool deleteFriend(std::uint64_t ID, std::uint64_t ID2);
 
+    bool addProject(std::uint64_t ID, const std::string &name, Role role);
     const std::vector<Account> &getAccounts() const;
 };

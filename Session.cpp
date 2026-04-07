@@ -37,6 +37,9 @@ const std::string &Session::getAccountUsername() const {
 const std::vector<Project> &Session::getProjects() const {
     return currentAccount -> getProjects();
 }
+const std::string &Session::getProjectName() const {
+    return currentProject -> getName();
+}
 const std::vector<Task> &Session::getTasks() const{
     return currentProject -> getTasks();
 }
@@ -57,7 +60,7 @@ Project* Session::findProjectByID (std::uint64_t ID) {
 
 
 void Session::addProject(const std::string &name) {
-    currentAccount -> addProject(name, getAccountID(), getAccountUsername());
+    currentAccount -> addProject(name, getAccountID(), getAccountUsername(), Role::OWNER);
 }
 
 

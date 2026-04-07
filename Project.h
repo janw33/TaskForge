@@ -14,7 +14,7 @@ class Project
 	std::ptrdiff_t findTaskIndexByID(std::uint64_t ID);
 
 public:
-	Project(const std::string& name, std::uint64_t ID, std::uint64_t ownerID, const std::string &ownerUsername);
+	Project(const std::string& name, std::uint64_t ID, std::uint64_t userID, const std::string &Username, Role role);
 
 	const std::string& getName() const;
 	std::uint64_t getID() const;

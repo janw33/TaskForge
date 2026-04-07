@@ -31,6 +31,8 @@ class Interface
 
 	//show projects
 	void printProjectList();
+	void insideUserProject();
+	void insideAdminProject();
 	void insideOwnerProject();
 	void showProjects();
 
@@ -48,7 +50,9 @@ class Interface
 	bool accountSettings();
 
 //=========PROJECT===================
-	void printProjectMenu();
+	void printUserProjectMenu();
+	void printAdminProjectMenu();
+	void printOwnerProjectMenu();
 
 //---------Tasks---------------------
 	//show tasks

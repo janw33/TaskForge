@@ -78,6 +78,16 @@ bool Storage::deleteFriend(std::uint64_t ID, std::uint64_t ID2){
     return true;
 }
 
+bool Storage::addProject(std::uint64_t ID, const std::string &name, Role role) {
+    Account* a = findAccountByID(ID);
+
+    if (!a) return false;
+
+    a -> addProject(name, a->getID(), a->getUsername(), role);
+    return true;
+}
+
+
 const std::vector<Account> &Storage::getAccounts() const {
     return accounts;
 }

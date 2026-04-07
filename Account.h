@@ -28,7 +28,7 @@ class Account
 	void setPassword(const std::string &newPassword);
 
 	Project* findProjectByID(std::uint64_t ID);
-	void addProject(const std::string &name, std::uint64_t ownerID, const std::string& ownerUsername);
+	void addProject(const std::string &name, std::uint64_t userID, const std::string& Username, Role role);
 	bool deleteProject(std::uint64_t ID);
 
 	void addFriend(std::uint64_t ID);
