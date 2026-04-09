@@ -1,7 +1,7 @@
 #include "Storage.h"
 
 Storage::Storage()
-    :nextID(1)
+    :nextAccountID(1), nextProjectID(1)
 {
 }
 
@@ -32,7 +32,7 @@ Account* Storage::logIn(const std::string &username, const std::string &password
 
 
 Account* Storage::signUp(const std::string &username,const std::string& password) {
-    accounts.emplace_back(username, password, nextID++);
+    accounts.emplace_back(username, password, nextAccountID++);
     return &accounts.back();
 }
 
@@ -52,7 +52,38 @@ bool Storage::deleteAccount(std::uint64_t ID) {
     return true;
 }
 
+Project* Storage::findProjectByID(std::uint64_t ID){
+    for(size_t i = 0; i < projects.size(); i++) 
+        if (projects[i].getID() == ID) return &projects[i];
+    
 
+    return nullptr;
+}
+std::uint64_t Storage::addProject(const std::string &name, std::uint64_t userID, Role role) {
+    std::uint64_t nextID = nextProjectID++;
+    projects.emplace_back(name, nextID, userID, role);
+
+    return nextID;
+}
+std::ptrdiff_t Storage::findProjectIndexByID(std::uint64_t ID) {
+    for(size_t i = 0; i < projects.size(); i++) 
+        if (projects[i].getID() == ID) return i;
+    
+
+    return -1;
+}
+bool Storage::deleteProject(std::uint64_t ID) {
+    std::ptrdiff_t index = findProjectIndexByID(ID);
+    if(index == -1) return false;
+
+    projects.erase(projects.begin() + index);
+    for(auto &acc : accounts) { 
+        for ( auto projectID : acc.getProjectsIDs()) {
+            if(projectID == ID) acc.deleteProjectID(projectID);
+    }
+}
+    return true;
+}
 
 bool Storage::addFriend(std::uint64_t ID, std::uint64_t ID2){
     Account* a = findAccountByID(ID);
@@ -78,14 +109,6 @@ bool Storage::deleteFriend(std::uint64_t ID, std::uint64_t ID2){
     return true;
 }
 
-bool Storage::addProject(std::uint64_t ID, const std::string &name, Role role) {
-    Account* a = findAccountByID(ID);
-
-    if (!a) return false;
-
-    a -> addProject(name, a->getID(), a->getUsername(), role);
-    return true;
-}
 
 
 const std::vector<Account> &Storage::getAccounts() const {

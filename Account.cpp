@@ -1,7 +1,7 @@
 #include "Account.h"
 
 Account::Account(const std::string& username, const std::string& password, std::uint64_t ID)
-	:username(username), password(password), ID(ID), projectNextID(1)
+	:username(username), password(password), ID(ID)
 {
 }
 
@@ -21,9 +21,9 @@ std::uint64_t Account::getID() const
 {
     return ID;
 }
-const std::vector<Project>& Account::getProjects() const
+const std::vector<std::uint64_t>& Account::getProjectsIDs() const
 {
-    return projects;
+    return projectsIDs;
 }
 const std::vector<std::uint64_t>& Account::getFriendsIDs() const{
     return friendsIDs;
@@ -39,33 +39,25 @@ void Account::setPassword(const std::string &newPassword)
 }
 
 	
-Project* Account::findProjectByID(std::uint64_t ID)
+std::ptrdiff_t Account::findProjectsIDsIndexByID(std::uint64_t ID)
 {
-    for(size_t i = 0; i < projects.size(); i++)
+    for(size_t i = 0; i < projectsIDs.size(); i++)
     {
-        if(ID == projects[i].getID()) return &projects[i];
-    }
-    return nullptr;
-}
-std::ptrdiff_t Account::findProjectIndexByID(std::uint64_t ID)
-{
-    for(size_t i = 0; i < projects.size(); i++)
-    {
-        if(ID == projects[i].getID()) return i;
+        if(ID == projectsIDs[i]) return i;
     }
     return -1;
 }
 
-void Account::addProject(const std::string &name, std::uint64_t userID, const std::string &Username, Role role)
+void Account::addProjectID(std::uint64_t ID)
 {
-    projects.emplace_back(name, projectNextID++, userID, Username, role);
+    projectsIDs.push_back(ID);
 }
-bool Account::deleteProject(std::uint64_t ID)
+bool Account::deleteProjectID(std::uint64_t ID)
 {
-    std::ptrdiff_t index = findProjectIndexByID(ID);
+    std::ptrdiff_t index = findProjectsIDsIndexByID(ID);
     if(index == -1) return false;
 
-    projects.erase(projects.begin() + index);
+    projectsIDs.erase(projectsIDs.begin() + index);
     return true;
 }
 

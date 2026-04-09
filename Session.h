@@ -13,27 +13,19 @@ class Session
     public:
     Session();
 
-    bool isAccountOpened();
-    bool isProjectOpened();
-    bool isTaskOpened();
-
     void changeUsername(const std::string& newUsername);
     void changePassword(const std::string& newPassword);
 
-    std::uint64_t getAccountID() const;
-    const std::string &getAccountUsername() const;
-    const std::vector<Project> &getProjects() const;
-    const std::string &getProjectName() const;
-    const std::vector<Task> &getTasks() const;
-    const std::vector<std::uint64_t> &getFriendsIDs() const;
-    const std::vector<ProjectMember> &getProjectMembers() const;
+    Account *getCurrentAccount();
+    Project *getCurrentProject();
+    Task* getCurrentTask();
 
-    Project* findProjectByID(std::uint64_t ID);
 
-    void addProject(const std::string &name);
-    bool deleteProject(std::uint64_t ID);
+    void addProjectID(std::uint64_t ID);
+    bool deleteProjectID(std::uint64_t ID);
+
     ProjectMember* findMemberByID(std::uint64_t ID);
-    void addMember(std::uint64_t ID,const std::string &username, Role role);
+    void addMember(std::uint64_t ID, Role role);
     bool deleteMember(std::uint64_t ID);
 
     Task* findTaskByID(std::uint64_t ID);

@@ -1,9 +1,9 @@
 #include "Project.h"
 
-Project::Project(const std::string &name, std::uint64_t ID, std::uint64_t userID, const std::string &Username, Role role)
+Project::Project(const std::string &name, std::uint64_t ID, std::uint64_t userID, Role role)
     : name(name), ID(ID), taskNextID(1)
 {
-    members.emplace_back(userID,Username, role);
+    members.emplace_back(userID, role);
 }
 
 
@@ -59,8 +59,8 @@ ProjectMember* Project::findMemberByID(std::uint64_t ID) {
     return nullptr;
 }
 
-void Project::addMember(std::uint64_t ID,const std::string &username, Role role) {
-    members.emplace_back(ID,username, role);
+void Project::addMember(std::uint64_t ID, Role role) {
+    members.emplace_back(ID, role);
 }
 std::ptrdiff_t Project::findMemberIndexByID(std::uint64_t ID){
     for(size_t i = 0; i < members.size(); i++) {

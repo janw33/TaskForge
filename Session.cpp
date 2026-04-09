@@ -6,19 +6,6 @@ Session::Session()
 }
 
 
-
-bool Session::isAccountOpened() {
-    return currentAccount;
-}
-bool Session::isProjectOpened() {
-    return currentProject;
-}
-bool Session::isTaskOpened() {
-    return currentTask;
-}
-
-
-
 void Session::changeUsername(const std::string &newUsername) {
     currentAccount->setUsername(newUsername);
 }
@@ -26,55 +13,37 @@ void Session::changePassword(const std::string &newPassword) {
     currentAccount->setPassword(newPassword);
 }
 
-
-
-std::uint64_t Session::getAccountID() const {
-    return currentAccount -> getID();
+Account* Session::getCurrentAccount() {
+    if(currentAccount) return currentAccount;
+    else return nullptr;
 }
-const std::string &Session::getAccountUsername() const {
-    return currentAccount -> getUsername();
+Project* Session::getCurrentProject() {
+    if(currentProject) return currentProject;
+    else return nullptr;
 }
-const std::vector<Project> &Session::getProjects() const {
-    return currentAccount -> getProjects();
-}
-const std::string &Session::getProjectName() const {
-    return currentProject -> getName();
-}
-const std::vector<Task> &Session::getTasks() const{
-    return currentProject -> getTasks();
-}
-const std::vector<std::uint64_t> &Session::getFriendsIDs() const {
-    return currentAccount -> getFriendsIDs();
-}
-const std::vector<ProjectMember> &Session::getProjectMembers() const {
-    return currentProject -> getProjectMembers();
+Task* Session::getCurrentTask() {
+    if(currentTask) return currentTask;
+    else return nullptr;
 }
 
 
 
-Project* Session::findProjectByID (std::uint64_t ID) {
-    return currentAccount -> findProjectByID(ID);
+void Session::addProjectID(std::uint64_t ID) {
+    currentAccount -> addProjectID(ID);
 }
 
 
-
-
-void Session::addProject(const std::string &name) {
-    currentAccount -> addProject(name, getAccountID(), getAccountUsername(), Role::OWNER);
-}
-
-
-bool Session::deleteProject(std::uint64_t ID) {
-    if(currentAccount -> deleteProject(ID)) return true;
-        else return false;
+bool Session::deleteProjectID(std::uint64_t ID) {
+    if(currentAccount -> deleteProjectID(ID)) return true;
+    else return false;
 }
 
 
 ProjectMember* Session::findMemberByID(std::uint64_t ID) {
     return currentProject -> findMemberByID(ID);
 }
-void Session::addMember(std::uint64_t ID,const std::string& username, Role role) {
-    currentProject -> addMember(ID, username, role);
+void Session::addMember(std::uint64_t ID, Role role) {
+    currentProject -> addMember(ID, role);
 }
 bool Session::deleteMember(std::uint64_t ID) {
     return currentProject -> deleteMember(ID);

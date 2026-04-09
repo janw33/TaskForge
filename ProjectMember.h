@@ -8,12 +8,10 @@ class ProjectMember {
     private:
     Role role;
     std::uint64_t ID;
-    std::string username;
 
     public:
-    ProjectMember(std::uint64_t ID, const std::string &username, Role role);
+    ProjectMember(std::uint64_t ID, Role role);
     Role getRole() const;
     std::uint64_t getID() const;
-    const std::string &getUsername() const; 
     std::string roleToString() const;
 }; 

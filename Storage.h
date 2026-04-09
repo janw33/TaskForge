@@ -6,9 +6,12 @@ class Storage
 {  
     private:
     std::vector<Account>accounts;
-    std::uint64_t nextID;
+    std::uint64_t nextAccountID;
+    std::vector<Project>projects;
+    std::uint64_t nextProjectID;
 
     std::ptrdiff_t findAccountIndexByID(std::uint64_t ID);
+    std::ptrdiff_t findProjectIndexByID(std::uint64_t ID);
     public:
     Storage();
 
@@ -23,6 +26,9 @@ class Storage
     bool addFriend(std::uint64_t ID, std::uint64_t ID2);
     bool deleteFriend(std::uint64_t ID, std::uint64_t ID2);
 
-    bool addProject(std::uint64_t ID, const std::string &name, Role role);
+    Project* findProjectByID(std::uint64_t ID);
+    std::uint64_t addProject(const std::string &name, std::uint64_t userID, Role role);
+    bool deleteProject(std::uint64_t ID);
+
     const std::vector<Account> &getAccounts() const;
 };

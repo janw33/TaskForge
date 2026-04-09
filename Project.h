@@ -14,7 +14,7 @@ class Project
 	std::ptrdiff_t findTaskIndexByID(std::uint64_t ID);
 
 public:
-	Project(const std::string& name, std::uint64_t ID, std::uint64_t userID, const std::string &Username, Role role);
+	Project(const std::string& name, std::uint64_t ID, std::uint64_t userID, Role role);
 
 	const std::string& getName() const;
 	std::uint64_t getID() const;
@@ -29,7 +29,7 @@ public:
 
 	ProjectMember* findMemberByID(std::uint64_t ID);
 
-	void addMember(std::uint64_t ID,const std::string &username, Role role);
+	void addMember(std::uint64_t ID, Role role);
 	std::ptrdiff_t findMemberIndexByID(std::uint64_t ID);
 	bool deleteMember(std::uint64_t ID);
 };

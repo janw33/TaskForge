@@ -19,9 +19,8 @@ class Interface
 	void printAccountMenu();
 	
 	//show friend
-	void printAvailableAccountsList();
-	void printFriendsList();
-	void showFriends();
+	bool printAvailableAccountsList();
+	bool printFriendsList();
 
 	//add friend
 	void addFriend();

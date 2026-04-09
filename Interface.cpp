@@ -65,7 +65,7 @@ void Interface::login()
         Account* acc = storage.logIn(username, password);
         if(acc) session.setCurrentAccount(acc);
         else {
-            std::cout << "Invalid Credentials";
+            std::cout << "Invalid Credentials\n";
             return;
         }
 
@@ -91,78 +91,84 @@ void Interface::printAccountMenu()
     std::cout << "[8] Log Out       \n";
 }
 
-void Interface::printAvailableAccountsList() {
-    if(!session.isAccountOpened()) {
+bool Interface::printFriendsList() {
+    auto currentAccount = session.getCurrentAccount();
+    if (!currentAccount) {
         std::cout << "Error\n";
-        return;
+        return false;
     }
 
-    for (size_t i = 0; i < storage.getAccounts().size(); i++) {
+    const auto &friends = currentAccount -> getFriendsIDs();
 
-        auto& account = storage.getAccounts()[i];
+    if(friends.empty()) {
+        std::cout << "You have zero friends\n";
+        return false;
+    }
 
-        if (account.getID() == session.getAccountID()) continue;
+    for(auto friendID : friends) {
+    Account* f = storage.findAccountByID(friendID);
+    if(f) std::cout << "[" << f->getID() << "] " << f -> getUsername() << '\n';
+    }
+
+    return true;
+}
+
+bool Interface::printAvailableAccountsList() {
+    auto currentAccount = session.getCurrentAccount();
+    if (!currentAccount) {
+        std::cout << "Error\n";
+        return false;
+    }
+
+    const auto& friends = currentAccount->getFriendsIDs();
+
+    bool foundAny = false;
+
+    for (const auto& account : storage.getAccounts()) {
+
+        if (account.getID() == currentAccount->getID()) continue;
 
         bool isFriend = false;
-        for (size_t j = 0; j < session.getFriendsIDs().size(); j++) {
-            if (session.getFriendsIDs()[j] == account.getID()) {
+
+        for (auto friendID : friends) {
+            if (friendID == account.getID()) {
                 isFriend = true;
                 break;
             }
         }
 
         if (!isFriend) {
-            std::cout << "[" + std::to_string(account.getID()) + "] " + account.getUsername() + '\n';
+            foundAny = true;
+            std::cout << "[" << account.getID() << "] " << account.getUsername() << '\n';
         }
     }
-}
-void Interface::printFriendsList() {
-    if(!session.isAccountOpened()) {
-        std::cout <<"Error\n";
-        return;
+    if(!foundAny) {
+        std::cout << "There is no more accounts\n";
+        return false;
     }
 
-    const auto &friends = session.getFriendsIDs();
-
-    if(friends.empty()) {
-        std::cout << "You have zero friends\n";
-        return;
-    }
-
-    for(auto id : friends) {
-    Account* f = storage.findAccountByID(id);
-    if(f) std::cout << "[" + std::to_string(f->getID()) + "] " + f -> getUsername() + '\n';
-    }
-}
-void Interface::showFriends(){
-    if(!session.isAccountOpened()) {
-        std::cout << "Error\n";
-        return;
-    }
-
-    printFriendsList();
+    return true;
 }
 
 void Interface::addFriend(){
-    if(!session.isAccountOpened()) {
+    auto currentAccount = session.getCurrentAccount();
+    if (!currentAccount) {
         std::cout << "Error\n";
         return;
     }
 
     std::cout << "Enter friend ID\n";
 
-    printAvailableAccountsList();
+    if(!printAvailableAccountsList()) {
+        return;
+    }
 
     std::string friendIDStr;
     std::getline(std::cin, friendIDStr);
     std::uint64_t friendID = std::stoull(friendIDStr);
 
-    if(session.isHeMyFriend(friendID)) {
-        std::cout << "Error\n";
-        return;
-    }
-    if(!storage.addFriend(session.getAccountID(), friendID)){
-        std::cout << "Error\n";
+    if(currentAccount->getID()==friendID || session.isHeMyFriend(friendID) || !storage.addFriend(currentAccount->getID(), friendID)){
+        std::cout << "Invalid ID\n";
         return;
     }
     
@@ -170,25 +176,22 @@ void Interface::addFriend(){
 }
 
 void Interface::deleteFriend(){
-    if(!session.isAccountOpened()) {
+    auto currentAccount = session.getCurrentAccount();
+    if (!currentAccount) {
         std::cout << "Error\n";
         return;
     }
 
     std::cout << "Enter friend ID\n";
 
-    printFriendsList();
+    if(!printFriendsList()) return;
 
     std::string friendIDStr;
     std::getline(std::cin, friendIDStr);
     std::uint64_t friendID = std::stoull(friendIDStr);
 
-    if(!session.isHeMyFriend(friendID)) {
-        std::cout << "Error\n";
-        return;
-    }
-    if(!storage.deleteFriend(session.getAccountID(), friendID)){
-        std::cout << "Error\n";
+    if(currentAccount->getID()==friendID || !session.isHeMyFriend(friendID) || !storage.deleteFriend(currentAccount->getID(), friendID)){
+        std::cout << "Invalid ID\n";
         return;
     }
 
@@ -210,12 +213,16 @@ void Interface::printOwnerProjectMenu()
 }
 void Interface::printProjectList()
 {
-    if(!session.isAccountOpened()) {
+    auto currentAccount = session.getCurrentAccount();
+    if (!currentAccount) {
         std::cout << "Error\n";
         return;
     }
 
-    for(const auto& project : session.getProjects()) std::cout <<"[" + std::to_string(project.getID()) + "] " + project.getName() + '\n';
+    for(auto projectID : currentAccount->getProjectsIDs()) {
+        auto project = storage.findProjectByID(projectID);
+        if(project) std::cout <<"[" << project -> getID() << "] " << project -> getName() << '\n'; 
+    }
 }
 void Interface::printUserProjectMenu() {
     std::cout << "================= \n";
@@ -226,11 +233,6 @@ void Interface::printUserProjectMenu() {
     std::cout << "[3] Exit          \n";
 }
 void Interface::insideUserProject() {
-    if(!session.isProjectOpened()) {
-        std::cout << "Error\n" ;
-        return;
-    }
-
     while(true) {
         printUserProjectMenu();
 
@@ -256,11 +258,6 @@ void Interface::printAdminProjectMenu() {
     std::cout << "[5] Exit          \n";
 }
 void Interface::insideAdminProject() {
-       if(!session.isProjectOpened()) {
-        std::cout << "Error\n" ;
-        return;
-    }
-
     while(true) {
         printAdminProjectMenu();
 
@@ -280,11 +277,6 @@ void Interface::insideAdminProject() {
 
 void Interface::insideOwnerProject()
 {
-    if(!session.isProjectOpened()) {
-        std::cout << "Error\n";
-        return;
-    }
-
     while(true)
     {
         printOwnerProjectMenu();
@@ -307,12 +299,13 @@ void Interface::insideOwnerProject()
 }
 void Interface::showProjects()
 {
-    if(!session.isAccountOpened()) {
-        std::cout << "Errro\n";
+    auto currentAccount = session.getCurrentAccount();
+    if (!currentAccount) {
+        std::cout << "Error\n";
         return;
     }
 
-    if(session.getProjects().empty())
+    if(currentAccount -> getProjectsIDs().empty())
     {
         std::cout << "You have zero projects\n";
         return;
@@ -326,7 +319,7 @@ void Interface::showProjects()
     std::getline(std::cin, idStr);
     std::uint64_t id = std::stoull(idStr);
 
-    Project* prj = session.findProjectByID(id);
+    Project* prj = storage.findProjectByID(id);
 
     if(!prj)
     {
@@ -336,7 +329,7 @@ void Interface::showProjects()
 
     session.setCurrentProject(prj);
 
-    ProjectMember* member = session.findMemberByID(session.getAccountID());
+    ProjectMember* member = session.findMemberByID(currentAccount -> getID());
 
     if(!member) {
         std::cout <<"Fatal error\n";
@@ -353,7 +346,8 @@ void Interface::showProjects()
 
 void Interface::addProject()
 {
-    if(!session.isAccountOpened()) {
+    auto currentAccount = session.getCurrentAccount();
+    if (!currentAccount) {
         std::cout << "Error\n";
         return;
     }
@@ -362,18 +356,13 @@ void Interface::addProject()
     std::string name;
     std::getline(std::cin, name);
 
-    session.addProject(name);
+    std::uint64_t projectID = storage.addProject(name, currentAccount -> getID(), Role::OWNER);
+    session.addProjectID(projectID);
     std::cout << "Project was added successfully\n";
 }
 
 void Interface::deleteProject()
 {
-
-    if(!session.isAccountOpened()) {
-        std::cout << "Error\n";
-        return;
-    }
-
     std::cout << "Enter project id: \n";
 
     printProjectList();
@@ -382,9 +371,35 @@ void Interface::deleteProject()
     std::getline(std::cin, idStr);
     std::uint64_t id = stoi(idStr);
 
-    if(!session.deleteProject(id))
+    auto currentAccount = session.getCurrentAccount();
+    if(!currentAccount) {
+        std::cout << "Error\n";
+        return;
+    }
+
+    auto currentProject = session.getCurrentProject();
+    if(!currentProject) {
+        std::cout << "Error\n";
+        return;
+    } 
+    
+    auto currentMember = currentProject -> findMemberByID(currentAccount -> getID());
+    if(!currentMember) {
+        std::cout <<"Error\n";
+        return;
+    }
+
+    if(currentMember -> getRole() != Role::OWNER) {
+        std::cout << "You have no permission to delete this project\n";
+        return;
+    }
+    if(!session.deleteProjectID(id))
     {
         std::cout << "Invalid ID\n";
+        return;
+    }
+    if(!storage.deleteProject(id)) {
+        std::cout << "Error\n";
         return;
     }
 
@@ -392,7 +407,13 @@ void Interface::deleteProject()
 }
 
 bool Interface::alreadyInProject(std::uint64_t ID) {
-     for(const auto& member : session.getProjectMembers()){
+    auto currentProject = session.getCurrentProject();
+    if(!currentProject) {
+        std::cout << "Error\n";
+        return false;
+    }
+
+     for(const auto& member : currentProject -> getProjectMembers()){
         if (ID == member.getID()) {
             return true;
         }
@@ -400,12 +421,13 @@ bool Interface::alreadyInProject(std::uint64_t ID) {
     return false;
 }
 bool Interface::printAvailableUsersList() {
-    if(!session.isProjectOpened()) {
+    auto currentAccount = session.getCurrentAccount();
+    if(!currentAccount) {
         std::cout << "Error\n";
         return false;
     }
 
-    const auto &friends = session.getFriendsIDs();
+    const auto &friends = currentAccount -> getFriendsIDs();
 
     if(friends.empty()) {
         std::cout << "You have zero friends\n";
@@ -421,25 +443,30 @@ bool Interface::printAvailableUsersList() {
     return true;
 }
 bool Interface::printProjectMembers() {
-    if(!session.isProjectOpened()) {
-        std::cout<<"Error\n";
+    auto currentProject = session.getCurrentProject();
+    if(!currentProject) {
+        std::cout << "Error\n";
         return false;
     }
     
-    if(session.getProjectMembers().empty()) {
+    const auto& members = currentProject -> getProjectMembers();
+
+    if(members.empty()) {
         std::cout << "There is zero project members\n";
         return false;
     }
 
-    for(const auto& member : session.getProjectMembers()) {
-        std::cout << "[" << member.getID() << "] " << member.getUsername() << " " << member.roleToString() << '\n';
+    for(const auto& member : members) {
+        auto acc = storage.findAccountByID(member.getID());
+        std::cout << "[" << acc -> getID() << "] " << acc -> getUsername() << " " << member.roleToString() << '\n';
     }
 
     return true;
 }
 
 void Interface::addUser() {
-    if(!session.isProjectOpened()) {
+    auto currentProject = session.getCurrentProject();
+    if(!currentProject) {
         std::cout << "Error\n";
         return;
     }
@@ -454,7 +481,7 @@ void Interface::addUser() {
     std::getline(std::cin, friendIDStr);
     std::uint64_t friendID = std::stoull(friendIDStr);
 
-    const auto& acc = storage.findAccountByID(friendID);
+    auto acc = storage.findAccountByID(friendID);
     if(!acc || alreadyInProject(friendID)) {std::cout << "Invalid ID\n"; return;}
 
     std::cout << "Which role has this user? (USER/ADMIN)\n";
@@ -463,11 +490,11 @@ void Interface::addUser() {
     std::transform(input.begin(), input.end(), input.begin() , ::toupper);
 
     if(input == "USER") {
-        storage.addProject(friendID, session.getProjectName(), Role::USER); 
-        session.addMember(friendID, acc->getUsername(), Role::USER); }
+        acc -> addProjectID(currentProject -> getID());
+        session.addMember(friendID, Role::USER); }
     else if(input == "ADMIN") {
-            storage.addProject(friendID, session.getProjectName(), Role::ADMIN);
-            session.addMember(friendID, acc->getUsername(), Role::ADMIN); } 
+        acc -> addProjectID(currentProject -> getID());
+        session.addMember(friendID, Role::ADMIN); } 
     else {
          std::cout<<"Invalid Input"; return; }
 
@@ -475,10 +502,12 @@ void Interface::addUser() {
 }   
 
 void Interface::deleteUser(){
-    if(!session.isProjectOpened()) {
+     auto currentAccount = session.getCurrentAccount();
+    if(!currentAccount) {
         std::cout << "Error\n";
         return;
     }
+
 
     std::cout << "Enter friend ID\n";
 
@@ -490,7 +519,7 @@ void Interface::deleteUser(){
 
     ProjectMember* member = session.findMemberByID(friendID);
 
-    if(session.getAccountID() == friendID || !member || member -> getRole() == Role::OWNER || !session.deleteMember(friendID)) {
+    if(currentAccount -> getID() == friendID || !member || member -> getRole() == Role::OWNER || !session.deleteMember(friendID)) {
         std::cout << "Invalid ID\n";
         return;
     }
@@ -510,11 +539,6 @@ void Interface::printMenuAccountSettings()
 }
 void Interface::changeUsername()
 {
-    if(!session.isAccountOpened()) {
-        std::cout << "Error\n";
-        return;
-    }
-
     while(true)
     {
         std::cout << "Enter new username\n";
@@ -534,11 +558,6 @@ void Interface::changeUsername()
 }
 void Interface::changePassword()
 {
-    if(!session.isAccountOpened()) {
-        std::cout << "Error\n";
-        return;
-    }
-
     std::cout << "Enter new password\n";
     std::string newPassword;
     std::getline(std::cin, newPassword);
@@ -548,8 +567,13 @@ void Interface::changePassword()
 }
 bool Interface::deleteAccount()
 {
+    auto currentAccount = session.getCurrentAccount();
+    if(!currentAccount) {
+        std::cout << "Error\n";
+        return false;
+    }
 
-    if(!storage.deleteAccount(session.getAccountID()))
+    if(!storage.deleteAccount(currentAccount -> getID()))
     {
         std::cout << "Fatal error\n";
         return false;
@@ -560,11 +584,6 @@ bool Interface::deleteAccount()
 }
 bool Interface::accountSettings()
 {
-    if(!session.isAccountOpened()) {
-        std::cout << "Error\n";
-        return false;
-    }
-
     while (true)
     {
         printMenuAccountSettings();
@@ -584,22 +603,18 @@ bool Interface::accountSettings()
 
 void Interface::printTaskList()
 {
-    if(!session.isProjectOpened()) {
+    auto currentProject = session.getCurrentProject();
+    if(!currentProject) {
         std::cout << "Error\n";
         return;
     }
 
-    for(const auto& Task : session.getTasks()) {
+    for(const auto& Task : currentProject -> getTasks()) {
         if(Task.getIsDone()) std::cout << "[" + std::to_string(Task.getID()) + "] " + Task.getName() + " " + "DONE" + '\n';
         else std::cout << "[" + std::to_string(Task.getID()) + "] " + Task.getName() + " " + "UNDONE" + '\n';
     }
 }
 void Interface::insideTask() {
-    if(!session.isTaskOpened()) {
-        std::cout << "Error\n";
-        return;
-    }
-
     while(true)
     {
         printTaskMenu();
@@ -623,12 +638,13 @@ void Interface::insideTask() {
 }
 void Interface::showTasks()
 {
-    if(!session.isProjectOpened()) {
+    auto currentProject = session.getCurrentProject();
+    if(!currentProject) {
         std::cout << "Error\n";
         return;
     }
 
-    if(session.getTasks().empty())
+    if(currentProject -> getTasks().empty())
     {
         std::cout << "Project has no tasks\n";
         return;
@@ -656,11 +672,6 @@ void Interface::showTasks()
 
 void Interface::addTask()
 {
-    if(!session.isProjectOpened()) {
-        std::cout << "Error\n";
-        return;
-    }
-
     std::cout << "Enter name: ";
     std::string name;
     std::getline(std::cin, name);
@@ -670,11 +681,6 @@ void Interface::addTask()
 }
 void Interface::deleteTask()
 {
-    if(!session.isProjectOpened()) {
-        std::cout<< "Error\n";
-        return;
-    }
-
     std::cout << "Enter ID:\n";
 
     printTaskList();
@@ -702,11 +708,6 @@ void Interface::printTaskMenu(){
 }
 
 void Interface::accountMenu(){
-     if(!session.isAccountOpened()) {
-        std::cout << "Error\n";
-        return;
-     }
-
      while(true)
         {
             printAccountMenu();
@@ -716,7 +717,7 @@ void Interface::accountMenu(){
 
             switch(accountChoice)
             {
-            case 1: showFriends(); break;
+            case 1: printFriendsList(); break;
             case 2: addFriend(); break;
             case 3: deleteFriend(); break;
             case 4: showProjects(); break;
