@@ -1,17 +1,31 @@
 #pragma once
-#include "Account.h"
-#include "Project.h"
-#include "Task.h"
+#include "Storage.h"
+
+enum class RegisterResult {
+    SUCCESS,
+    USERNAME_TAKEN
+};
+
+
+enum class LoginResult {
+    SUCCESS,
+    INVALID_USERNAME,
+    INVALID_PASSWORD
+};
 
 class Session
 {
     private:
+    Storage &storage;
     Account* currentAccount;
     Project* currentProject;
     Task* currentTask;
 
     public:
-    Session();
+    Session(Storage &storage);
+
+    RegisterResult signUp(const std::string &username,const std::string &password);
+    LoginResult login(const std::string &username, const std::string &password);
 
     void changeUsername(const std::string& newUsername);
     void changePassword(const std::string& newPassword);

@@ -21,9 +21,14 @@ bool Storage::isUsernameTaken(const std::string &username) {
 
     return false;
 }
-Account* Storage::logIn(const std::string &username, const std::string &password) {
+Account* Storage::addAccount(const std::string &username, const std::string &password) {
+    accounts.emplace_back(username, password, nextAccountID++);
+    return &accounts.back();
+}
+
+Account* Storage::findAccountByUsername(const std::string &username) {
     for(size_t i = 0; i < accounts.size(); i++) {
-        if(accounts[i].getUsername() == username && accounts[i].getPassword() == password) return &accounts[i];
+        if(accounts[i].getUsername() == username) return &accounts[i];
     }
 
     return nullptr;

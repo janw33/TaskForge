@@ -1,8 +1,8 @@
 #include <iostream>
 #include "Interface.h"
 
-Interface::Interface(Storage &st, Session &se)
-    : storage(st), session(se)
+Interface::Interface(Session &session)
+    : session(session)
 {
 }
 
@@ -24,30 +24,15 @@ void Interface::signUp()
         std::string username;
         std::getline(std::cin, username);
 
-        if(storage.isUsernameTaken(username))
-        {
-            std::cout<<"Username is unavailable\n";
-            session.logout();
-            continue;
-        }
-        //walidacja username
-
         std::cout<<"Enter password: ";
         std::string password;
         std::getline(std::cin, password);
 
-        //walidacja password, hashowanie password
-
-        Account* acc = storage.signUp(username, password);
-
-        if(acc) session.setCurrentAccount(acc);
-        else {
-            std::cout << "Fatal Error";
-            return;
+        switch(session.signUp(username, password))
+        {
+            case RegisterResult::SUCCESS : std::cout << "Signed up successfully\n"; return;
+            case RegisterResult::USERNAME_TAKEN : std::cout << "This useranem is already taken. Please, try again\n"; break;
         }
-
-        std::cout <<"Signed up successfully\n";
-        return;
     }
 }
 void Interface::login()
@@ -62,19 +47,13 @@ void Interface::login()
         std::string password;
         std::getline(std::cin, password);
 
-        Account* acc = storage.logIn(username, password);
-        if(acc) session.setCurrentAccount(acc);
-        else {
-            std::cout << "Invalid Credentials\n";
-            return;
+        switch(session.login(username, password)) {
+            case LoginResult::SUCCESS : std::cout << "Logged in successfully\n"; return;
+            case LoginResult::INVALID_USERNAME : std::cout << "Username is wrong"; break;
+            case LoginResult::INVALID_PASSWORD : std::cout << "Password is wrong"; break;
         }
-
-        std::cout << "Logged successfully\n";
-        return;
     }
 }
-
-
 
 void Interface::printAccountMenu()
 {

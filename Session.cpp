@@ -1,10 +1,26 @@
 #include "Session.h"
 
-Session::Session()
-    :currentAccount(nullptr), currentProject(nullptr)
+Session::Session(Storage &storage)
+    :storage(storage), currentAccount(nullptr), currentProject(nullptr), currentTask(nullptr)
 {
 }
+RegisterResult Session::signUp(const std::string &username, const std::string &password) {
+    if(storage.isUsernameTaken(username)) return RegisterResult::USERNAME_TAKEN;
 
+    auto newAccount = storage.addAccount(username, password);
+
+    setCurrentAccount(newAccount);
+    return RegisterResult::SUCCESS;
+}
+LoginResult Session::login(const std::string &username, const std::string &password) {
+    auto acc = storage.findAccountByUsername(username);
+
+    if(!acc) return LoginResult::INVALID_USERNAME;
+    if(acc -> getPassword() != password) return LoginResult::INVALID_PASSWORD;
+
+    setCurrentAccount(acc);
+    return LoginResult::SUCCESS;
+}
 
 void Session::changeUsername(const std::string &newUsername) {
     currentAccount->setUsername(newUsername);

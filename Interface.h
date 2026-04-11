@@ -1,13 +1,9 @@
 #pragma once
-#include "Storage.h"
 #include "Session.h"
 
 class Interface
 {
-//=================================
-
 //=========DATA====================
-	Storage &storage;
 	Session &session;
 //=========LOGIN===================
 	void printMenu();
@@ -85,6 +81,6 @@ class Interface
 
 	void accountMenu();
 public:
-	Interface(Storage &st, Session &se);
+	Interface(Session &session);
 	void run();
 };
