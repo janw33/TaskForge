@@ -35,26 +35,13 @@ Account* Storage::findAccountByUsername(const std::string &username) {
 }
 
 
-
-Account* Storage::signUp(const std::string &username,const std::string& password) {
-    accounts.emplace_back(username, password, nextAccountID++);
-    return &accounts.back();
-}
-
-
-
-std::ptrdiff_t Storage::findAccountIndexByID(std::uint64_t ID) {
+size_t Storage::findAccountIndexByID(std::uint64_t ID) {
     for(size_t i = 0; i < accounts.size(); i++) 
         if(accounts[i].getID() == ID) return i;
-
-    return -1;
 }
-bool Storage::deleteAccount(std::uint64_t ID) {
+void Storage::deleteAccount(std::uint64_t ID) {
     std::ptrdiff_t index = findAccountIndexByID(ID);
-    if(index == -1) return false;
-
     accounts.erase(accounts.begin() + index);
-    return true;
 }
 
 Project* Storage::findProjectByID(std::uint64_t ID){

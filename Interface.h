@@ -41,8 +41,8 @@ class Interface
 	void printMenuAccountSettings();
 	void changeUsername();
 	void changePassword();
-	bool deleteAccount();
-	bool accountSettings();
+	void deleteAccount();
+	void accountSettings();
 
 //=========PROJECT===================
 	void printUserProjectMenu();

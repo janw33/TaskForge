@@ -524,46 +524,35 @@ void Interface::changeUsername()
         std::string newUsername;
         std::getline(std::cin, newUsername);
 
-        if(storage.isUsernameTaken(newUsername))
-        {
-        std::cout<<"Username is unavailable\n";
-        continue;
+        switch(session.changeUsername(newUsername)) {
+            case ChangeUsernameResult::SUCCESS : std::cout << "Username was changed successfully\n"; return;
+            case ChangeUsernameResult::USERNAME_TAKEN : std::cout << "This useranem is already taken. Please, try again\n"; break;
+            case ChangeUsernameResult::SAME_AS_OLD : std::cout << "New username must be different from the current one\n"; break;
         }
-
-        session.changeUsername(newUsername);
-        std::cout << "Username was changed successfully\n";
-        return;
     }
 }
 void Interface::changePassword()
 {
-    std::cout << "Enter new password\n";
-    std::string newPassword;
-    std::getline(std::cin, newPassword);
+    while(true) {
+        std::cout << "Enter new password\n";
+        std::string newPassword;
+        std::getline(std::cin, newPassword);
 
-    session.changePassword(newPassword);
-    std::cout << "Password was changed successfully\n";
-}
-bool Interface::deleteAccount()
-{
-    auto currentAccount = session.getCurrentAccount();
-    if(!currentAccount) {
-        std::cout << "Error\n";
-        return false;
+        switch(session.changePassword(newPassword)) {
+            case ChangePasswordResult::SUCCESS : std::cout << "Password was changed successfully\n"; return;
+            case ChangePasswordResult::SAME_AS_OLD : std::cout << "New password must be different from the current one\n"; break;
+        }
     }
-
-    if(!storage.deleteAccount(currentAccount -> getID()))
-    {
-        std::cout << "Fatal error\n";
-        return false;
-    }
-
-    std::cout << "Account was deleted successfully\n";
-    return true;
 }
-bool Interface::accountSettings()
+void Interface::deleteAccount()
 {
-    while (true)
+    switch(session.deleteAccount()) {
+        case DeleteAccountResult::SUCCESS : std:: cout << "Account was delteted successfully\n"; return;
+    }
+}
+void Interface::accountSettings()
+{
+    while (session.isLogged())
     {
         printMenuAccountSettings();
         std::string choiceStr;
@@ -574,8 +563,8 @@ bool Interface::accountSettings()
         {
         case 1: changeUsername(); break;
         case 2: changePassword(); break;
-        case 3: if(deleteAccount()) return true; break;
-        case 4: std::cout<<"Goodbye\n"; return false;
+        case 3: deleteAccount(); break;
+        case 4: std::cout<<"Goodbye\n"; return;
         }
     }
 }

@@ -22,22 +22,38 @@ LoginResult Session::login(const std::string &username, const std::string &passw
     return LoginResult::SUCCESS;
 }
 
-void Session::changeUsername(const std::string &newUsername) {
+ChangeUsernameResult Session::changeUsername(const std::string &newUsername) {
+    assert(currentAccount && "No user logged in!");
+
+    if(currentAccount -> getUsername() == newUsername) return ChangeUsernameResult::SAME_AS_OLD;
+    if(storage.isUsernameTaken(newUsername)) return ChangeUsernameResult::USERNAME_TAKEN;
+
     currentAccount->setUsername(newUsername);
+    return ChangeUsernameResult::SUCCESS;
 }
-void Session::changePassword(const std::string &newPassword) {
+ChangePasswordResult Session::changePassword(const std::string &newPassword) {
+    assert(currentAccount && "No user logged in!");
+    if(currentAccount -> getPassword() == newPassword) return ChangePasswordResult::SAME_AS_OLD;
+
     currentAccount->setPassword(newPassword);
+    return ChangePasswordResult::SUCCESS;
+}
+DeleteAccountResult Session::deleteAccount() {
+    assert(currentAccount && "No user logged in!");
+    storage.deleteAccount(currentAccount -> getID());
+    logout();
+    return DeleteAccountResult::SUCCESS;
 }
 
-Account* Session::getCurrentAccount() {
+const Account* Session::getCurrentAccount() const{
     if(currentAccount) return currentAccount;
     else return nullptr;
 }
-Project* Session::getCurrentProject() {
+const Project* Session::getCurrentProject() const{
     if(currentProject) return currentProject;
     else return nullptr;
 }
-Task* Session::getCurrentTask() {
+const Task* Session::getCurrentTask() const{
     if(currentTask) return currentTask;
     else return nullptr;
 }

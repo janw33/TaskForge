@@ -1,5 +1,6 @@
 #pragma once
 #include "Storage.h"
+#include <cassert>
 
 enum class RegisterResult {
     SUCCESS,
@@ -11,6 +12,21 @@ enum class LoginResult {
     SUCCESS,
     INVALID_USERNAME,
     INVALID_PASSWORD
+};
+
+enum class ChangeUsernameResult {
+    SUCCESS,
+    SAME_AS_OLD,
+    USERNAME_TAKEN
+};
+
+enum class ChangePasswordResult {
+    SUCCESS,
+    SAME_AS_OLD
+};
+
+enum class DeleteAccountResult {
+    SUCCESS
 };
 
 class Session
@@ -27,12 +43,13 @@ class Session
     RegisterResult signUp(const std::string &username,const std::string &password);
     LoginResult login(const std::string &username, const std::string &password);
 
-    void changeUsername(const std::string& newUsername);
-    void changePassword(const std::string& newPassword);
+    ChangeUsernameResult changeUsername(const std::string& newUsername);
+    ChangePasswordResult changePassword(const std::string& newPassword);
+    DeleteAccountResult deleteAccount(); //dodac usuwanie projektow ktorych account byl posiadaczem
 
-    Account *getCurrentAccount();
-    Project *getCurrentProject();
-    Task* getCurrentTask();
+    const Account *getCurrentAccount() const;
+    const Project *getCurrentProject() const;
+    const Task* getCurrentTask() const;
 
 
     void addProjectID(std::uint64_t ID);
