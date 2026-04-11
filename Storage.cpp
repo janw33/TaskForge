@@ -57,24 +57,15 @@ std::uint64_t Storage::addProject(const std::string &name, std::uint64_t userID,
 
     return nextID;
 }
-std::ptrdiff_t Storage::findProjectIndexByID(std::uint64_t ID) {
+size_t Storage::findProjectIndexByID(std::uint64_t ID) {
     for(size_t i = 0; i < projects.size(); i++) 
         if (projects[i].getID() == ID) return i;
+}
+void Storage::deleteProject(std::uint64_t ID) {
+    for(auto &acc : accounts) acc.deleteProjectID(ID);
     
-
-    return -1;
-}
-bool Storage::deleteProject(std::uint64_t ID) {
     std::ptrdiff_t index = findProjectIndexByID(ID);
-    if(index == -1) return false;
-
     projects.erase(projects.begin() + index);
-    for(auto &acc : accounts) { 
-        for ( auto projectID : acc.getProjectsIDs()) {
-            if(projectID == ID) acc.deleteProjectID(projectID);
-    }
-}
-    return true;
 }
 
 bool Storage::addFriend(std::uint64_t ID, std::uint64_t ID2){

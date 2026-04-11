@@ -4,6 +4,9 @@ Session::Session(Storage &storage)
     :storage(storage), currentAccount(nullptr), currentProject(nullptr), currentTask(nullptr)
 {
 }
+
+
+
 RegisterResult Session::signUp(const std::string &username, const std::string &password) {
     if(storage.isUsernameTaken(username)) return RegisterResult::USERNAME_TAKEN;
 
@@ -12,6 +15,7 @@ RegisterResult Session::signUp(const std::string &username, const std::string &p
     setCurrentAccount(newAccount);
     return RegisterResult::SUCCESS;
 }
+
 LoginResult Session::login(const std::string &username, const std::string &password) {
     auto acc = storage.findAccountByUsername(username);
 
@@ -22,6 +26,8 @@ LoginResult Session::login(const std::string &username, const std::string &passw
     return LoginResult::SUCCESS;
 }
 
+
+
 ChangeUsernameResult Session::changeUsername(const std::string &newUsername) {
     assert(currentAccount && "No user logged in!");
 
@@ -31,6 +37,7 @@ ChangeUsernameResult Session::changeUsername(const std::string &newUsername) {
     currentAccount->setUsername(newUsername);
     return ChangeUsernameResult::SUCCESS;
 }
+
 ChangePasswordResult Session::changePassword(const std::string &newPassword) {
     assert(currentAccount && "No user logged in!");
     if(currentAccount -> getPassword() == newPassword) return ChangePasswordResult::SAME_AS_OLD;
@@ -38,12 +45,38 @@ ChangePasswordResult Session::changePassword(const std::string &newPassword) {
     currentAccount->setPassword(newPassword);
     return ChangePasswordResult::SUCCESS;
 }
+
 DeleteAccountResult Session::deleteAccount() {
     assert(currentAccount && "No user logged in!");
     storage.deleteAccount(currentAccount -> getID());
     logout();
     return DeleteAccountResult::SUCCESS;
 }
+
+
+
+void Session::addProject(const std::string &name) {
+    assert(currentAccount && "No user logged in!");
+    std::uint64_t projectID = storage.addProject(name, currentAccount -> getID(), Role::OWNER);
+    currentAccount -> addProjectID (projectID);
+}
+
+DeleteProjectResult Session::deleteProject(std::uint64_t ID) {
+    assert(currentAccount && "No user logged in!");
+
+    Project* project = storage.findProjectByID(ID);
+    if (!project) return DeleteProjectResult::INVALID_ID;
+
+    ProjectMember* currentMember = project -> findMemberByID (currentAccount -> getID());
+    if (!currentMember) return DeleteProjectResult::INVALID_ID;
+
+    if(currentMember -> getRole() != Role::OWNER) return DeleteProjectResult::NO_PERMISSION;
+
+    storage.deleteProject(ID);
+    return DeleteProjectResult::SUCCESS;
+}
+
+
 
 const Account* Session::getCurrentAccount() const{
     if(currentAccount) return currentAccount;
@@ -60,15 +93,7 @@ const Task* Session::getCurrentTask() const{
 
 
 
-void Session::addProjectID(std::uint64_t ID) {
-    currentAccount -> addProjectID(ID);
-}
 
-
-bool Session::deleteProjectID(std::uint64_t ID) {
-    if(currentAccount -> deleteProjectID(ID)) return true;
-    else return false;
-}
 
 
 ProjectMember* Session::findMemberByID(std::uint64_t ID) {

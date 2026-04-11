@@ -325,64 +325,29 @@ void Interface::showProjects()
 
 void Interface::addProject()
 {
-    auto currentAccount = session.getCurrentAccount();
-    if (!currentAccount) {
-        std::cout << "Error\n";
-        return;
-    }
-
     std::cout << "Enter project name\n";
     std::string name;
     std::getline(std::cin, name);
 
-    std::uint64_t projectID = storage.addProject(name, currentAccount -> getID(), Role::OWNER);
-    session.addProjectID(projectID);
+    session.addProject(name);
     std::cout << "Project was added successfully\n";
 }
 
 void Interface::deleteProject()
 {
-    std::cout << "Enter project id: \n";
+    std::cout << "Enter project ID: \n";
 
     printProjectList();
 
-    std::string idStr;
-    std::getline(std::cin, idStr);
-    std::uint64_t id = stoi(idStr);
+    std::string IDStr;
+    std::getline(std::cin, IDStr);
+    std::uint64_t ID = std::stoull(IDStr);
 
-    auto currentAccount = session.getCurrentAccount();
-    if(!currentAccount) {
-        std::cout << "Error\n";
-        return;
+    switch(session.deleteProject(ID)) {
+        case DeleteProjectResult::SUCCESS : std::cout << "Project deleted successfully\n"; break;
+        case DeleteProjectResult::INVALID_ID : std::cout << "Invalid ID\n"; break;
+        case DeleteProjectResult::NO_PERMISSION : std::cout << "You have no permission to delete this project\n"; break;
     }
-
-    auto currentProject = session.getCurrentProject();
-    if(!currentProject) {
-        std::cout << "Error\n";
-        return;
-    } 
-    
-    auto currentMember = currentProject -> findMemberByID(currentAccount -> getID());
-    if(!currentMember) {
-        std::cout <<"Error\n";
-        return;
-    }
-
-    if(currentMember -> getRole() != Role::OWNER) {
-        std::cout << "You have no permission to delete this project\n";
-        return;
-    }
-    if(!session.deleteProjectID(id))
-    {
-        std::cout << "Invalid ID\n";
-        return;
-    }
-    if(!storage.deleteProject(id)) {
-        std::cout << "Error\n";
-        return;
-    }
-
-    std::cout << "Project deleted successfully\n";
 }
 
 bool Interface::alreadyInProject(std::uint64_t ID) {

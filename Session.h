@@ -29,6 +29,12 @@ enum class DeleteAccountResult {
     SUCCESS
 };
 
+enum class DeleteProjectResult {
+    SUCCESS,
+    INVALID_ID,
+    NO_PERMISSION
+};
+
 class Session
 {
     private:
@@ -42,18 +48,18 @@ class Session
 
     RegisterResult signUp(const std::string &username,const std::string &password);
     LoginResult login(const std::string &username, const std::string &password);
-
     ChangeUsernameResult changeUsername(const std::string& newUsername);
     ChangePasswordResult changePassword(const std::string& newPassword);
     DeleteAccountResult deleteAccount(); //dodac usuwanie projektow ktorych account byl posiadaczem
+
+    void addProject(const std::string &name);
+    DeleteProjectResult deleteProject(std::uint64_t ID);
 
     const Account *getCurrentAccount() const;
     const Project *getCurrentProject() const;
     const Task* getCurrentTask() const;
 
 
-    void addProjectID(std::uint64_t ID);
-    bool deleteProjectID(std::uint64_t ID);
 
     ProjectMember* findMemberByID(std::uint64_t ID);
     void addMember(std::uint64_t ID, Role role);
