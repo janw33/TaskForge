@@ -29,6 +29,13 @@ enum class DeleteAccountResult {
     SUCCESS
 };
 
+enum class OpenProjectResult {
+    USER,
+    ADMIN,
+    OWNER,
+    INVALID_ID,
+};
+
 enum class DeleteProjectResult {
     SUCCESS,
     INVALID_ID,
@@ -52,6 +59,8 @@ class Session
     ChangePasswordResult changePassword(const std::string& newPassword);
     DeleteAccountResult deleteAccount(); //dodac usuwanie projektow ktorych account byl posiadaczem
 
+    std::vector <Project*> getCurrentUserProjects() const;
+    OpenProjectResult openProject(std::uint64_t ID);
     void addProject(const std::string &name);
     DeleteProjectResult deleteProject(std::uint64_t ID);
 

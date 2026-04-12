@@ -192,16 +192,15 @@ void Interface::printOwnerProjectMenu()
 }
 void Interface::printProjectList()
 {
-    auto currentAccount = session.getCurrentAccount();
-    if (!currentAccount) {
-        std::cout << "Error\n";
+    auto projects = session.getCurrentUserProjects();
+
+    if(projects.empty()) {
+        std::cout << "You have zero projects\n";
         return;
     }
 
-    for(auto projectID : currentAccount->getProjectsIDs()) {
-        auto project = storage.findProjectByID(projectID);
-        if(project) std::cout <<"[" << project -> getID() << "] " << project -> getName() << '\n'; 
-    }
+    std::cout << "Enter project ID: \n";
+    for(auto project : projects) std::cout << "[" << project -> getID() << "] " << project -> getName() << '\n';
 }
 void Interface::printUserProjectMenu() {
     std::cout << "================= \n";
@@ -278,49 +277,18 @@ void Interface::insideOwnerProject()
 }
 void Interface::showProjects()
 {
-    auto currentAccount = session.getCurrentAccount();
-    if (!currentAccount) {
-        std::cout << "Error\n";
-        return;
-    }
-
-    if(currentAccount -> getProjectsIDs().empty())
-    {
-        std::cout << "You have zero projects\n";
-        return;
-    }
-    
-    std::cout << "Enter project id: \n";
-
     printProjectList();
 
-    std::string idStr;
-    std::getline(std::cin, idStr);
-    std::uint64_t id = std::stoull(idStr);
+    std::string IDStr;
+    std::getline(std::cin, IDStr);
+    std::uint64_t ID = std::stoull(IDStr);
 
-    Project* prj = storage.findProjectByID(id);
-
-    if(!prj)
-    {
-        std::cout << "Invalid id\n";
-        return;
+    switch(session.openProject(ID)) {
+        case OpenProjectResult::OWNER : printOwnerProjectMenu(); break;
+        case OpenProjectResult::ADMIN : printAdminProjectMenu(); break; 
+        case OpenProjectResult::USER : printUserProjectMenu(); break;
+        case OpenProjectResult::INVALID_ID : std::cout << "Invalid ID\n"; break;
     }
-
-    session.setCurrentProject(prj);
-
-    ProjectMember* member = session.findMemberByID(currentAccount -> getID());
-
-    if(!member) {
-        std::cout <<"Fatal error\n";
-        return;
-    }
-
-    switch(member -> getRole()) {
-        case Role::USER : insideUserProject(); break;
-        case Role::ADMIN : insideAdminProject(); break;
-        case Role::OWNER : insideOwnerProject(); break;
-    }
-    
 }
 
 void Interface::addProject()
@@ -335,8 +303,6 @@ void Interface::addProject()
 
 void Interface::deleteProject()
 {
-    std::cout << "Enter project ID: \n";
-
     printProjectList();
 
     std::string IDStr;

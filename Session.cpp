@@ -55,6 +55,36 @@ DeleteAccountResult Session::deleteAccount() {
 
 
 
+std::vector<Project*> Session::getCurrentUserProjects() const {
+    assert(currentAccount && "No user logged in!");
+    std::vector <Project*> result;
+
+    for(auto projectID : currentAccount -> getProjectsIDs()) {
+        auto project = storage.findProjectByID(projectID);
+        if (project) result.push_back(project); 
+    }
+
+    return result;
+}
+
+OpenProjectResult Session::openProject(std::uint64_t ID) {
+    assert(currentAccount && "No user logged in!");
+
+    Project* prj = storage.findProjectByID(ID);
+    if(!prj) return OpenProjectResult::INVALID_ID;
+
+    setCurrentProject(prj);
+
+    ProjectMember* member = findMemberByID(currentAccount -> getID());
+    if(!member) return OpenProjectResult::INVALID_ID;
+    
+    switch(member -> getRole()) {
+        case Role::USER : return OpenProjectResult::USER;
+        case Role::ADMIN : return OpenProjectResult::ADMIN;
+        case Role::OWNER : return OpenProjectResult::OWNER;
+    }
+}
+
 void Session::addProject(const std::string &name) {
     assert(currentAccount && "No user logged in!");
     std::uint64_t projectID = storage.addProject(name, currentAccount -> getID(), Role::OWNER);
