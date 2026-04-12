@@ -30,6 +30,6 @@ public:
 	ProjectMember* findMemberByID(std::uint64_t ID);
 
 	void addMember(std::uint64_t ID, Role role);
-	std::ptrdiff_t findMemberIndexByID(std::uint64_t ID);
-	bool deleteMember(std::uint64_t ID);
+	size_t findMemberIndexByID(std::uint64_t ID);
+	void deleteMember(std::uint64_t ID);
 };

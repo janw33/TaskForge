@@ -49,9 +49,9 @@ class Interface
 	void printAdminProjectMenu();
 	void printOwnerProjectMenu();
 
-//---------Tasks---------------------
+//---------Tasks--------------------- //done
 	//show tasks
-	bool printTaskList(); //done
+	bool printTaskList(); 
 	void insideTask();
 	void showTasks();
 
@@ -63,12 +63,10 @@ class Interface
 
 //---------Users---------------------
 	//show users
-	bool alreadyInProject(std::uint64_t ID);
 	bool printAvailableUsersList();
 	bool printProjectMembers();
 
 	//add user 
-	void printAvailalbleUsersList();
 	void addUser();
 
 	//deleteUser
@@ -78,7 +76,6 @@ class Interface
 	void printTaskMenu();
 
 //===================================
-
 	void accountMenu();
 public:
 	Interface(Session &session);

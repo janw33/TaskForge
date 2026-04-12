@@ -206,33 +206,51 @@ bool Session::deleteTask(std::uint64_t ID) {
 
 
 
-const Account* Session::getCurrentAccount() const{
-    if(currentAccount) return currentAccount;
-    else return nullptr;
+bool Session::alreadyInProject(std::uint64_t ID) {
+    assert(currentProject && "No project opened!");
+    for (const auto& member : currentProject -> getProjectMembers()){
+        if (ID == member.getID()) {
+            return true;
+        }
+    }
+    return false;
 }
-const Project* Session::getCurrentProject() const{
-    if(currentProject) return currentProject;
-    else return nullptr;
+AddMemberResult Session::addMember(std::uint64_t ID, Role role) {
+    assert(currentProject && "No project opened!");
+
+    if(alreadyInProject(ID)) return AddMemberResult::ALREADY_IN_PROJECT;
+
+    auto member = storage.findAccountByID(ID);
+    if(!member) return AddMemberResult::INVALID_ID;
+
+    currentProject -> addMember(ID, role);
+    member -> addProjectID(currentProject -> getID());
+
+    return AddMemberResult::SUCCESS;
 }
-const Task* Session::getCurrentTask() const{
-    if(currentTask) return currentTask;
-    else return nullptr;
+DeleteMemberResult Session::deleteMember(std::uint64_t ID) {
+    assert(currentProject && "No project opened!");
+
+    if(currentAccount -> getID() == ID) return DeleteMemberResult::CANNOT_DELETE_SELF;
+
+    auto member = storage.findAccountByID(ID);
+    if(!member) return DeleteMemberResult::INVALID_ID;
+
+    if(!alreadyInProject(ID)) return DeleteMemberResult::IS_NOT_MEMBER;
+
+    currentProject -> deleteMember(ID);
+    member -> deleteProjectID(currentProject -> getID());
+    return DeleteMemberResult::SUCCESS;
+
 }
-
-
-
 
 
 
 ProjectMember* Session::findMemberByID(std::uint64_t ID) {
     return currentProject -> findMemberByID(ID);
 }
-void Session::addMember(std::uint64_t ID, Role role) {
-    currentProject -> addMember(ID, role);
-}
-bool Session::deleteMember(std::uint64_t ID) {
-    return currentProject -> deleteMember(ID);
-}
+
+
 
 Task* Session::findTaskByID(std::uint64_t ID){
     return currentProject -> findTaskByID(ID);
@@ -242,29 +260,11 @@ Task* Session::findTaskByID(std::uint64_t ID){
 
 
 
-bool Session::deleteTask(std::uint64_t ID) {
-
-    if(currentProject -> deleteTask(ID)) return true;
-    else return false;
-}
-
 void Session::changeTaskStatus(){
     currentTask -> changeStatus();
 }
 bool Session::getIsDone() const{
     return currentTask -> getIsDone();
-}
-
-
-
-void Session::setCurrentAccount(Account* acc) {
-    currentAccount = acc;
-}
-void Session::setCurrentProject(Project* prj) {
-    currentProject = prj;
-}
-void Session::setCurrentTask(Task* tsk){
-    currentTask = tsk;
 }
 
 

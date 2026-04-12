@@ -62,17 +62,10 @@ ProjectMember* Project::findMemberByID(std::uint64_t ID) {
 void Project::addMember(std::uint64_t ID, Role role) {
     members.emplace_back(ID, role);
 }
-std::ptrdiff_t Project::findMemberIndexByID(std::uint64_t ID){
-    for(size_t i = 0; i < members.size(); i++) {
-        if(members[i].getID() == ID) return i;
-    }
-
-    return -1;
+size_t Project::findMemberIndexByID(std::uint64_t ID){
+    for(size_t i = 0; i < members.size(); i++) if(members[i].getID() == ID) return i;
 }
-bool Project::deleteMember(std::uint64_t ID) {
-    std::ptrdiff_t index = findMemberIndexByID (ID);
-    if(index == -1) return false;
-
+void Project::deleteMember(std::uint64_t ID) {
+    size_t index = findMemberIndexByID (ID);
     members.erase(members.begin() + index);
-    return true;
 }

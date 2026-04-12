@@ -270,26 +270,9 @@ void Interface::deleteProject()
     }
 }
 
-bool Interface::alreadyInProject(std::uint64_t ID) {
-    auto currentProject = session.getCurrentProject();
-    if(!currentProject) {
-        std::cout << "Error\n";
-        return false;
-    }
 
-     for(const auto& member : currentProject -> getProjectMembers()){
-        if (ID == member.getID()) {
-            return true;
-        }
-    }
-    return false;
-}
 bool Interface::printAvailableUsersList() {
-    auto currentAccount = session.getCurrentAccount();
-    if(!currentAccount) {
-        std::cout << "Error\n";
-        return false;
-    }
+
 
     const auto &friends = currentAccount -> getFriendsIDs();
 
@@ -297,7 +280,7 @@ bool Interface::printAvailableUsersList() {
         std::cout << "You have zero friends\n";
         return false;
     }
-
+    std::cout << "Enter friend ID\n";
     for(auto ID : friends) {
     if(!alreadyInProject(ID)) {
     Account* f = storage.findAccountByID(ID);
@@ -320,6 +303,7 @@ bool Interface::printProjectMembers() {
         return false;
     }
 
+    std::cout << "Enter member ID\n";
     for(const auto& member : members) {
         auto acc = storage.findAccountByID(member.getID());
         std::cout << "[" << acc -> getID() << "] " << acc -> getUsername() << " " << member.roleToString() << '\n';
@@ -329,14 +313,6 @@ bool Interface::printProjectMembers() {
 }
 
 void Interface::addUser() {
-    auto currentProject = session.getCurrentProject();
-    if(!currentProject) {
-        std::cout << "Error\n";
-        return;
-    }
-
-    std::cout << "Enter friend ID\n";
-
     if(!printAvailableUsersList()) {
         return;
     }
@@ -345,50 +321,40 @@ void Interface::addUser() {
     std::getline(std::cin, friendIDStr);
     std::uint64_t friendID = std::stoull(friendIDStr);
 
-    auto acc = storage.findAccountByID(friendID);
-    if(!acc || alreadyInProject(friendID)) {std::cout << "Invalid ID\n"; return;}
-
     std::cout << "Which role has this user? (USER/ADMIN)\n";
     std::string input;
     std::getline(std::cin, input);
     std::transform(input.begin(), input.end(), input.begin() , ::toupper);
 
-    if(input == "USER") {
-        acc -> addProjectID(currentProject -> getID());
-        session.addMember(friendID, Role::USER); }
-    else if(input == "ADMIN") {
-        acc -> addProjectID(currentProject -> getID());
-        session.addMember(friendID, Role::ADMIN); } 
-    else {
-         std::cout<<"Invalid Input"; return; }
+    Role role;
 
-    std::cout<<"User added successfully\n";
+    if (input == "USER") role = Role::USER;
+    else if (input == "ADMIN") role = Role::ADMIN;
+    else {
+        std::cout << "Invalid input\n"; 
+        return;
+    }
+    
+    switch(session.addMember(friendID, role)) {
+        case AddMemberResult::SUCCESS : std::cout << "Member added successfully\n"; break;
+        case AddMemberResult::INVALID_ID : std::cout << "Invalid ID\n"; break;
+        case AddMemberResult::ALREADY_IN_PROJECT : std::cout << "Member is already in project\n"; break;
+    }
 }   
 
 void Interface::deleteUser(){
-     auto currentAccount = session.getCurrentAccount();
-    if(!currentAccount) {
-        std::cout << "Error\n";
-        return;
-    }
-
-
-    std::cout << "Enter friend ID\n";
-
     if(!printProjectMembers()) return;
 
-    std::string friendIDStr;
-    std::getline (std::cin, friendIDStr);
-    std::uint64_t friendID = std::stoull(friendIDStr);
+    std::string IDStr;
+    std::getline (std::cin, IDStr);
+    std::uint64_t ID = std::stoull(IDStr);
 
-    ProjectMember* member = session.findMemberByID(friendID);
-
-    if(currentAccount -> getID() == friendID || !member || member -> getRole() == Role::OWNER || !session.deleteMember(friendID)) {
-        std::cout << "Invalid ID\n";
-        return;
+    switch(session.deleteMember(ID)) {
+        case DeleteMemberResult::SUCCESS : std::cout << "Member deleted successfully\n"; break;
+        case DeleteMemberResult::INVALID_ID : std::cout << "Invalid ID\n"; break;
+        case DeleteMemberResult::IS_NOT_MEMBER : std::cout << "This is not project member\n" ; break;
+        case DeleteMemberResult::CANNOT_DELETE_SELF : std::cout << "You cannot delete yourself\n"; break;
     }
-
-    std::cout << "Member deleted successfully\n";
 }
 
 void Interface::printMenuAccountSettings()
