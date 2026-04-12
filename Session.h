@@ -29,6 +29,19 @@ enum class DeleteAccountResult {
     SUCCESS
 };
 
+enum class AddFriendResult {
+    SUCCESS,
+    INVALID_ID,
+    CANNOT_ADD_SELF,
+    ALREADY_YOUR_FRIEND
+};
+enum class DeleteFriendResult {
+    SUCCESS,
+    INVALID_ID,
+    NOT_FRIEND,
+    CANNOT_DELETE_SELF
+};
+
 enum class OpenProjectResult {
     USER,
     ADMIN,
@@ -59,6 +72,11 @@ class Session
     ChangePasswordResult changePassword(const std::string& newPassword);
     DeleteAccountResult deleteAccount(); //dodac usuwanie projektow ktorych account byl posiadaczem
 
+    std::vector <Account> getAvailableAccounts() const;
+    std::vector <Account*> getCurrentUserFriends() const;
+    AddFriendResult addFriend(std::uint64_t ID);
+    DeleteFriendResult deleteFriend(std::uint64_t ID);
+
     std::vector <Project*> getCurrentUserProjects() const;
     OpenProjectResult openProject(std::uint64_t ID);
     void addProject(const std::string &name);
@@ -85,7 +103,6 @@ class Session
     void setCurrentProject(Project* prj);
     void setCurrentTask(Task* tsk);
 
-    bool isHeMyFriend(std::uint64_t ID);
     bool isLogged();
 
     void logout();

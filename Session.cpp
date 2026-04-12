@@ -55,6 +55,72 @@ DeleteAccountResult Session::deleteAccount() {
 
 
 
+std::vector<Account> Session::getAvailableAccounts() const {
+    assert(currentAccount && "No user logged in!");
+    std::vector <Account> result;
+
+    const auto& friends = currentAccount->getFriendsIDs();
+
+    for (const auto& account : storage.getAccounts()) {
+
+        if (account.getID() == currentAccount->getID()) continue;
+
+        bool isFriend = false;
+
+        for (auto friendID : friends) {
+            if (friendID == account.getID()) {
+                isFriend = true;
+                break;
+            }
+        }
+
+        if (!isFriend) result.push_back(account);
+    }
+    return result;
+}
+
+std::vector<Account*> Session::getCurrentUserFriends() const {
+    assert(currentAccount && "No user logged in!");
+    std::vector <Account*> result;
+
+    for(auto friendID : currentAccount -> getFriendsIDs()) {
+        auto f = storage.findAccountByID(friendID);
+        if (f) result.push_back(f); 
+    }
+
+    return result;
+}
+
+AddFriendResult Session::addFriend(std::uint64_t ID) {
+    assert(currentAccount && "No user logged in!");
+    if(ID == currentAccount -> getID()) return AddFriendResult::CANNOT_ADD_SELF;
+
+    Account* friendAccount = storage.findAccountByID(ID);
+
+    if(!friendAccount) return AddFriendResult::INVALID_ID;
+    if(currentAccount -> isHeMyFriend(ID)) return AddFriendResult::ALREADY_YOUR_FRIEND;
+
+    currentAccount -> addFriend(ID);
+    friendAccount -> addFriend(currentAccount -> getID());
+    return AddFriendResult::SUCCESS;
+}
+
+DeleteFriendResult Session::deleteFriend(std::uint64_t ID) {
+    assert(currentAccount && "No user logged in!");
+    if(ID == currentAccount -> getID()) return DeleteFriendResult::CANNOT_DELETE_SELF;
+
+    Account* friendAccount = storage.findAccountByID(ID);
+
+    if(!friendAccount) return DeleteFriendResult::INVALID_ID;
+    if(!currentAccount -> isHeMyFriend(ID)) return DeleteFriendResult::NOT_FRIEND;
+
+    currentAccount -> deleteFriend(ID);
+    friendAccount -> deleteFriend(currentAccount -> getID());
+    return DeleteFriendResult::SUCCESS;
+}
+
+
+
 std::vector<Project*> Session::getCurrentUserProjects() const {
     assert(currentAccount && "No user logged in!");
     std::vector <Project*> result;
@@ -176,9 +242,6 @@ void Session::setCurrentTask(Task* tsk){
 
 bool Session::isLogged() {
     return currentAccount != nullptr;
-}
-bool Session::isHeMyFriend(std::uint64_t ID){
-    return currentAccount -> isHeMyFriend(ID);
 }
 
 

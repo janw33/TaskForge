@@ -66,22 +66,16 @@ bool Account::deleteProjectID(std::uint64_t ID)
 void Account::addFriend(std::uint64_t ID) {
     friendsIDs.push_back(ID);
 }
-std::ptrdiff_t Account::findFriendIndexByID(std::uint64_t ID) {
+size_t Account::findFriendIndexByID(std::uint64_t ID) {
     for(size_t i = 0; i < friendsIDs.size(); i++) 
-    {
         if(friendsIDs[i] == ID) return i;
-    }
-    return -1;
 }
-bool Account::deleteFriend(std::uint64_t ID) {
+void Account::deleteFriend(std::uint64_t ID) {
     size_t index = findFriendIndexByID(ID);
-    if(index == -1) return false;
-
     friendsIDs.erase(friendsIDs.begin() + index);
-    return true;
 }
 bool Account::isHeMyFriend(std::uint64_t ID) {
-    for(const auto& friendID : friendsIDs) 
+    for(auto friendID : friendsIDs) 
         if(friendID == ID) return true;
 
     return false;

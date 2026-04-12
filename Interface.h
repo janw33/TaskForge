@@ -8,8 +8,8 @@ class Interface
 //=========LOGIN===================
 	void printMenu();
 
-	void signUp();
-	void login();
+	void signUp(); //done
+	void login(); //done
 
 //=========ACCOUNT=================
 	void printAccountMenu();
@@ -19,23 +19,23 @@ class Interface
 	bool printFriendsList();
 
 	//add friend
-	void addFriend();
+	void addFriend(); //done
 
 	//delete friend
 	void deleteFriend();
 
-	//show projects
-	void printProjectList();
+	//show projects //done
+	bool printProjectList(); 
 	void insideUserProject();
 	void insideAdminProject();
 	void insideOwnerProject();
-	void showProjects();
+	void showProjects(); 
 
 	//add project
-	void addProject();
+	void addProject(); //done
 
 	//delete project
-	void deleteProject();
+	void deleteProject(); //done
 
 	//account settings
 	void printMenuAccountSettings();

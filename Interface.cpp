@@ -71,110 +71,65 @@ void Interface::printAccountMenu()
 }
 
 bool Interface::printFriendsList() {
-    auto currentAccount = session.getCurrentAccount();
-    if (!currentAccount) {
-        std::cout << "Error\n";
-        return false;
-    }
 
-    const auto &friends = currentAccount -> getFriendsIDs();
+    auto friends = session.getCurrentUserFriends();
 
     if(friends.empty()) {
         std::cout << "You have zero friends\n";
         return false;
     }
 
-    for(auto friendID : friends) {
-    Account* f = storage.findAccountByID(friendID);
-    if(f) std::cout << "[" << f->getID() << "] " << f -> getUsername() << '\n';
-    }
-
+    for(auto f : friends) std::cout << "[" << f->getID() << "] " << f -> getUsername() << '\n';
     return true;
 }
 
 bool Interface::printAvailableAccountsList() {
-    auto currentAccount = session.getCurrentAccount();
-    if (!currentAccount) {
-        std::cout << "Error\n";
+
+    auto availableAccounts = session.getAvailableAccounts();
+
+    if(availableAccounts.empty()) {
+        std::cout << "There is no available account\n";
         return false;
     }
 
-    const auto& friends = currentAccount->getFriendsIDs();
-
-    bool foundAny = false;
-
-    for (const auto& account : storage.getAccounts()) {
-
-        if (account.getID() == currentAccount->getID()) continue;
-
-        bool isFriend = false;
-
-        for (auto friendID : friends) {
-            if (friendID == account.getID()) {
-                isFriend = true;
-                break;
-            }
-        }
-
-        if (!isFriend) {
-            foundAny = true;
-            std::cout << "[" << account.getID() << "] " << account.getUsername() << '\n';
-        }
-    }
-    if(!foundAny) {
-        std::cout << "There is no more accounts\n";
-        return false;
-    }
-
+    for(auto acc : availableAccounts) std::cout << "[" << acc.getID() << "] " << acc.getUsername() << '\n';
     return true;
 }
 
 void Interface::addFriend(){
-    auto currentAccount = session.getCurrentAccount();
-    if (!currentAccount) {
-        std::cout << "Error\n";
-        return;
-    }
-
     std::cout << "Enter friend ID\n";
 
     if(!printAvailableAccountsList()) {
         return;
     }
 
-    std::string friendIDStr;
-    std::getline(std::cin, friendIDStr);
-    std::uint64_t friendID = std::stoull(friendIDStr);
+    std::string IDStr;
+    std::getline(std::cin, IDStr);
+    std::uint64_t ID = std::stoull(IDStr);
 
-    if(currentAccount->getID()==friendID || session.isHeMyFriend(friendID) || !storage.addFriend(currentAccount->getID(), friendID)){
-        std::cout << "Invalid ID\n";
-        return;
+    switch(session.addFriend(ID)) {
+        case AddFriendResult::SUCCESS : std::cout<<"Friend added successfully\n"; break;
+        case AddFriendResult::INVALID_ID : std::cout<<"Invalid ID\n"; break;
+        case AddFriendResult::ALREADY_YOUR_FRIEND : std::cout << "You cannot add your friend again\n"; break;
+        case AddFriendResult::CANNOT_ADD_SELF : std::cout << "You cannon add yourself\n"; break;
     }
-    
-    std::cout << "Friend added successfully\n";
 }
 
 void Interface::deleteFriend(){
-    auto currentAccount = session.getCurrentAccount();
-    if (!currentAccount) {
-        std::cout << "Error\n";
-        return;
-    }
-
     std::cout << "Enter friend ID\n";
 
     if(!printFriendsList()) return;
 
-    std::string friendIDStr;
-    std::getline(std::cin, friendIDStr);
-    std::uint64_t friendID = std::stoull(friendIDStr);
+    std::string IDStr;
+    std::getline(std::cin, IDStr);
+    std::uint64_t ID = std::stoull(IDStr);
 
-    if(currentAccount->getID()==friendID || !session.isHeMyFriend(friendID) || !storage.deleteFriend(currentAccount->getID(), friendID)){
-        std::cout << "Invalid ID\n";
-        return;
+    switch(session.deleteFriend(ID)) {
+        case DeleteFriendResult::SUCCESS : std::cout<<"Friend added successfully\n"; break;
+        case DeleteFriendResult::INVALID_ID : std::cout<<"Invalid ID\n"; break;
+        case DeleteFriendResult::NOT_FRIEND : std::cout<<"This is not your friend\n"; break;
+        case DeleteFriendResult::CANNOT_DELETE_SELF : std::cout<<"You cannont delete yourself\n"; break;
     }
-
-    std::cout << "Friend deleted successfully\n";
 }
 
 void Interface::printOwnerProjectMenu()
@@ -190,17 +145,18 @@ void Interface::printOwnerProjectMenu()
     std::cout << "[6] Delete User   \n";
     std::cout << "[7] Exit          \n";
 }
-void Interface::printProjectList()
+bool Interface::printProjectList()
 {
     auto projects = session.getCurrentUserProjects();
 
     if(projects.empty()) {
         std::cout << "You have zero projects\n";
-        return;
+        return false;
     }
 
     std::cout << "Enter project ID: \n";
     for(auto project : projects) std::cout << "[" << project -> getID() << "] " << project -> getName() << '\n';
+    return true;
 }
 void Interface::printUserProjectMenu() {
     std::cout << "================= \n";
@@ -303,7 +259,7 @@ void Interface::addProject()
 
 void Interface::deleteProject()
 {
-    printProjectList();
+    if(!printProjectList()) return;
 
     std::string IDStr;
     std::getline(std::cin, IDStr);

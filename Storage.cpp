@@ -68,30 +68,6 @@ void Storage::deleteProject(std::uint64_t ID) {
     projects.erase(projects.begin() + index);
 }
 
-bool Storage::addFriend(std::uint64_t ID, std::uint64_t ID2){
-    Account* a = findAccountByID(ID);
-    Account* b = findAccountByID(ID2);
-
-    if(!a || !b) return false;
-    if(ID == ID2) return false;
-
-    a -> addFriend(ID2);
-    b -> addFriend(ID);
-    return true;
-}
-bool Storage::deleteFriend(std::uint64_t ID, std::uint64_t ID2){
-    Account* a = findAccountByID(ID);
-    Account* b = findAccountByID(ID2);
-
-    if(!a || !b) return false;
-    if(ID == ID2) return false;
-
-    if(!a -> deleteFriend(ID2)) return false;
-    if(!b -> deleteFriend(ID)) return false;
-
-    return true;
-}
-
 
 
 const std::vector<Account> &Storage::getAccounts() const {
