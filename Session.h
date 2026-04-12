@@ -55,6 +55,10 @@ enum class DeleteProjectResult {
     NO_PERMISSION
 };
 
+enum class OpenTaskResult {
+    SUCCESS,
+    INVALID_ID
+};  
 class Session
 {
     private:
@@ -82,6 +86,11 @@ class Session
     void addProject(const std::string &name);
     DeleteProjectResult deleteProject(std::uint64_t ID);
 
+    std::vector <Task> getCurrentProjectTasks() const;
+    OpenTaskResult openTask(std::uint64_t ID);
+    void addTask(const std::string &name);
+    bool deleteTask(std::uint64_t ID);
+
     const Account *getCurrentAccount() const;
     const Project *getCurrentProject() const;
     const Task* getCurrentTask() const;
@@ -94,8 +103,6 @@ class Session
 
     Task* findTaskByID(std::uint64_t ID);
 
-    void addTask(const std::string &name);
-    bool deleteTask(std::uint64_t ID);
     void changeTaskStatus();
     bool getIsDone() const;
 

@@ -174,6 +174,38 @@ DeleteProjectResult Session::deleteProject(std::uint64_t ID) {
 
 
 
+std::vector <Task> Session::getCurrentProjectTasks() const{
+    assert(currentProject && "No project opened!");
+    std::vector <Task> result;
+    for(const auto& task : currentProject -> getTasks()) {
+        result.push_back(task);
+    }
+
+    return result;
+}
+
+OpenTaskResult Session::openTask(std::uint64_t ID) {
+    assert(currentProject && "No project opened!");
+    Task* tsk = findTaskByID(ID);
+
+    if(!tsk) return OpenTaskResult::INVALID_ID;
+
+    setCurrentTask(tsk);
+    return OpenTaskResult::SUCCESS;
+}
+
+void Session::addTask(const std::string &name){
+    assert(currentProject && "No project opened!");
+    currentProject -> addTask(name);
+}
+bool Session::deleteTask(std::uint64_t ID) {
+    assert(currentProject && "No project opened!");
+    if(currentProject -> deleteTask(ID)) return true;
+    else return false;
+}
+
+
+
 const Account* Session::getCurrentAccount() const{
     if(currentAccount) return currentAccount;
     else return nullptr;
@@ -208,15 +240,12 @@ Task* Session::findTaskByID(std::uint64_t ID){
 
 
 
-void Session::addTask(const std::string &name){
-    currentProject -> addTask(name);
-}
-
 
 
 bool Session::deleteTask(std::uint64_t ID) {
+
     if(currentProject -> deleteTask(ID)) return true;
-        else return false;
+    else return false;
 }
 
 void Session::changeTaskStatus(){

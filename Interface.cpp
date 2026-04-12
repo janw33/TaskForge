@@ -79,6 +79,7 @@ bool Interface::printFriendsList() {
         return false;
     }
 
+    std::cout << "Enter friend ID\n";
     for(auto f : friends) std::cout << "[" << f->getID() << "] " << f -> getUsername() << '\n';
     return true;
 }
@@ -92,13 +93,12 @@ bool Interface::printAvailableAccountsList() {
         return false;
     }
 
+    std::cout << "Enter friend ID\n";
     for(auto acc : availableAccounts) std::cout << "[" << acc.getID() << "] " << acc.getUsername() << '\n';
     return true;
 }
 
 void Interface::addFriend(){
-    std::cout << "Enter friend ID\n";
-
     if(!printAvailableAccountsList()) {
         return;
     }
@@ -116,8 +116,6 @@ void Interface::addFriend(){
 }
 
 void Interface::deleteFriend(){
-    std::cout << "Enter friend ID\n";
-
     if(!printFriendsList()) return;
 
     std::string IDStr;
@@ -456,18 +454,21 @@ void Interface::accountSettings()
     }
 }
 
-void Interface::printTaskList()
+bool Interface::printTaskList()
 {
-    auto currentProject = session.getCurrentProject();
-    if(!currentProject) {
-        std::cout << "Error\n";
-        return;
+    auto tasks = session.getCurrentProjectTasks();
+
+    if(tasks.empty()){
+        std::cout << "Project has no tasks\n";
+        return false;
     }
 
-    for(const auto& Task : currentProject -> getTasks()) {
-        if(Task.getIsDone()) std::cout << "[" + std::to_string(Task.getID()) + "] " + Task.getName() + " " + "DONE" + '\n';
-        else std::cout << "[" + std::to_string(Task.getID()) + "] " + Task.getName() + " " + "UNDONE" + '\n';
+    std::cout << "Enter Task ID\n";
+    for(const auto& task : tasks) {
+        if(task.getIsDone()) std::cout << "[" << task.getID() << "] " << task.getName() << " DONE" << '\n';
+        else std::cout << "[" << task.getID() << "] " << task.getName() << " UNDONE" << '\n';
     }
+    return true;
 }
 void Interface::insideTask() {
     while(true)
@@ -492,37 +493,17 @@ void Interface::insideTask() {
     }
 }
 void Interface::showTasks()
-{
-    auto currentProject = session.getCurrentProject();
-    if(!currentProject) {
-        std::cout << "Error\n";
-        return;
+{  
+    if(!printTaskList()) return;
+
+    std::string IDStr;
+    std::getline(std::cin, IDStr);
+    std::uint64_t ID = std::stoull(IDStr);
+
+    switch(session.openTask(ID)) {
+        case OpenTaskResult::SUCCESS : insideTask(); break;
+        case OpenTaskResult::INVALID_ID : std::cout<<"Invalid ID\n"; break;
     }
-
-    if(currentProject -> getTasks().empty())
-    {
-        std::cout << "Project has no tasks\n";
-        return;
-    }
-    std::cout << "Enter ID:\n";
-
-    printTaskList();
-
-    std::string choiceStr;
-    std::getline(std::cin, choiceStr);
-    std::uint64_t choice = std::stoull(choiceStr);
-
-    Task* tsk = session.findTaskByID(choice);
-
-    if(!tsk)
-    {
-        std::cout << "Invalid id\n";
-        return;
-    }
-
-    session.setCurrentTask(tsk);
-    insideTask();
-    session.exitTask();
 }
 
 void Interface::addTask()
@@ -536,9 +517,7 @@ void Interface::addTask()
 }
 void Interface::deleteTask()
 {
-    std::cout << "Enter ID:\n";
-
-    printTaskList();
+    if(!printTaskList()) return;
 
     std::string choiceStr;
     std::getline(std::cin, choiceStr);
@@ -563,7 +542,7 @@ void Interface::printTaskMenu(){
 }
 
 void Interface::accountMenu(){
-     while(true)
+     while(session.isLogged())
         {
             printAccountMenu();
             std::string accountChoiceStr;
@@ -578,14 +557,7 @@ void Interface::accountMenu(){
             case 4: showProjects(); break;
             case 5: addProject(); break;
             case 6: deleteProject(); break;
-
-            case 7: 
-            if(accountSettings()){
-                session.logout();
-                return;
-            } 
-            break;
-
+            case 7: accountSettings(); break;
             case 8: session.logout(); std::cout << "Log Out\n"; return;
             }
         }
