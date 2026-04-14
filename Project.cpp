@@ -64,6 +64,8 @@ void Project::addMember(std::uint64_t ID, Role role) {
 }
 size_t Project::findMemberIndexByID(std::uint64_t ID){
     for(size_t i = 0; i < members.size(); i++) if(members[i].getID() == ID) return i;
+
+    return 0;
 }
 void Project::deleteMember(std::uint64_t ID) {
     size_t index = findMemberIndexByID (ID);

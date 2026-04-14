@@ -4,8 +4,8 @@
 int main()
 {
     Storage storage;
-    Session session;
-    Interface ui(storage, session);
+    Session session(storage);
+    Interface ui(session);
 
     ui.run();
     

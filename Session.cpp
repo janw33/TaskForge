@@ -12,7 +12,7 @@ RegisterResult Session::signUp(const std::string &username, const std::string &p
 
     auto newAccount = storage.addAccount(username, password);
 
-    setCurrentAccount(newAccount);
+    currentAccount = newAccount;
     return RegisterResult::SUCCESS;
 }
 
@@ -22,7 +22,7 @@ LoginResult Session::login(const std::string &username, const std::string &passw
     if(!acc) return LoginResult::INVALID_USERNAME;
     if(acc -> getPassword() != password) return LoginResult::INVALID_PASSWORD;
 
-    setCurrentAccount(acc);
+    currentAccount = acc;
     return LoginResult::SUCCESS;
 }
 
@@ -48,6 +48,19 @@ ChangePasswordResult Session::changePassword(const std::string &newPassword) {
 
 DeleteAccountResult Session::deleteAccount() {
     assert(currentAccount && "No user logged in!");
+    auto projects = currentAccount->getProjectsIDs();
+
+    for(auto projectID : projects) {
+        Project* prj = storage.findProjectByID(projectID);
+        if(!prj) continue;
+
+        ProjectMember* member = prj -> findMemberByID(currentAccount -> getID());
+        if(!member) continue;
+
+        if(member -> getRole() == Role::OWNER) storage.deleteProject(projectID);
+            else prj -> deleteMember(currentAccount -> getID());
+    }
+
     storage.deleteAccount(currentAccount -> getID());
     logout();
     return DeleteAccountResult::SUCCESS;
@@ -139,9 +152,9 @@ OpenProjectResult Session::openProject(std::uint64_t ID) {
     Project* prj = storage.findProjectByID(ID);
     if(!prj) return OpenProjectResult::INVALID_ID;
 
-    setCurrentProject(prj);
+    currentProject = prj;
 
-    ProjectMember* member = findMemberByID(currentAccount -> getID());
+    ProjectMember* member = currentProject -> findMemberByID(currentAccount -> getID());
     if(!member) return OpenProjectResult::INVALID_ID;
     
     switch(member -> getRole()) {
@@ -186,11 +199,11 @@ std::vector <Task> Session::getCurrentProjectTasks() const{
 
 OpenTaskResult Session::openTask(std::uint64_t ID) {
     assert(currentProject && "No project opened!");
-    Task* tsk = findTaskByID(ID);
+    Task* tsk = currentProject -> findTaskByID(ID);
 
     if(!tsk) return OpenTaskResult::INVALID_ID;
 
-    setCurrentTask(tsk);
+    currentTask = tsk;
     return OpenTaskResult::SUCCESS;
 }
 
@@ -203,10 +216,15 @@ bool Session::deleteTask(std::uint64_t ID) {
     if(currentProject -> deleteTask(ID)) return true;
     else return false;
 }
+void Session::changeTaskStatus(){
+    currentTask -> changeStatus();
+}
+bool Session::getIsDone() const{
+    return currentTask -> getIsDone();
+}
 
 
-
-bool Session::alreadyInProject(std::uint64_t ID) {
+bool Session::alreadyInProject(std::uint64_t ID) const{
     assert(currentProject && "No project opened!");
     for (const auto& member : currentProject -> getProjectMembers()){
         if (ID == member.getID()) {
@@ -215,6 +233,40 @@ bool Session::alreadyInProject(std::uint64_t ID) {
     }
     return false;
 }
+
+
+
+std::vector <Account*> Session::getAvailableMembersAccounts() const {
+    assert(currentProject && "No project opened!");
+
+    std::vector <Account*> result;
+
+    for(auto friendID : currentAccount -> getFriendsIDs()) {
+        if(!alreadyInProject(friendID)) {
+            Account* acc = storage.findAccountByID(friendID);
+            if(acc) result.push_back(acc);
+        }
+    }
+
+    return result;
+}
+
+std::vector <MemberView> Session::getProjectMembersView() const{
+    assert(currentProject && "No project opened!");
+
+    std::vector <MemberView> result;
+    for(const auto& member : currentProject -> getProjectMembers()) {
+        auto acc = storage.findAccountByID(member.getID());
+        result.push_back({
+            member.getID(), 
+            acc -> getUsername(), 
+            member.roleToString()
+        });
+    }
+
+    return result;
+}
+
 AddMemberResult Session::addMember(std::uint64_t ID, Role role) {
     assert(currentProject && "No project opened!");
 
@@ -228,6 +280,7 @@ AddMemberResult Session::addMember(std::uint64_t ID, Role role) {
 
     return AddMemberResult::SUCCESS;
 }
+
 DeleteMemberResult Session::deleteMember(std::uint64_t ID) {
     assert(currentProject && "No project opened!");
 
@@ -246,32 +299,10 @@ DeleteMemberResult Session::deleteMember(std::uint64_t ID) {
 
 
 
-ProjectMember* Session::findMemberByID(std::uint64_t ID) {
-    return currentProject -> findMemberByID(ID);
-}
-
-
-
-Task* Session::findTaskByID(std::uint64_t ID){
-    return currentProject -> findTaskByID(ID);
-}
-
-
-
-
-
-void Session::changeTaskStatus(){
-    currentTask -> changeStatus();
-}
-bool Session::getIsDone() const{
-    return currentTask -> getIsDone();
-}
-
-
-
 bool Session::isLogged() {
     return currentAccount != nullptr;
 }
+
 
 
 void Session::logout() {

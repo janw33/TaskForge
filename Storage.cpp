@@ -36,8 +36,9 @@ Account* Storage::findAccountByUsername(const std::string &username) {
 
 
 size_t Storage::findAccountIndexByID(std::uint64_t ID) {
-    for(size_t i = 0; i < accounts.size(); i++) 
-        if(accounts[i].getID() == ID) return i;
+    for(size_t i = 0; i < accounts.size(); i++) if(accounts[i].getID() == ID) return i;
+
+    return 0;
 }
 void Storage::deleteAccount(std::uint64_t ID) {
     std::ptrdiff_t index = findAccountIndexByID(ID);
@@ -58,8 +59,9 @@ std::uint64_t Storage::addProject(const std::string &name, std::uint64_t userID,
     return nextID;
 }
 size_t Storage::findProjectIndexByID(std::uint64_t ID) {
-    for(size_t i = 0; i < projects.size(); i++) 
-        if (projects[i].getID() == ID) return i;
+    for(size_t i = 0; i < projects.size(); i++) if (projects[i].getID() == ID) return i;
+
+    return 0;
 }
 void Storage::deleteProject(std::uint64_t ID) {
     for(auto &acc : accounts) acc.deleteProjectID(ID);

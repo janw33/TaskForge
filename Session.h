@@ -60,6 +60,12 @@ enum class OpenTaskResult {
     INVALID_ID
 };  
 
+struct MemberView {
+    std::uint64_t ID;
+    std::string username;
+    std::string role;
+};
+
 enum class AddMemberResult {
     SUCCESS,
     INVALID_ID,
@@ -72,6 +78,7 @@ enum class DeleteMemberResult {
     IS_NOT_MEMBER,
     CANNOT_DELETE_SELF
 };
+
 class Session
 {
     private:
@@ -80,7 +87,7 @@ class Session
     Project* currentProject;
     Task* currentTask;
 
-    bool alreadyInProject(std::uint64_t ID);
+    bool alreadyInProject(std::uint64_t ID) const;
     public:
     Session(Storage &storage);
 
@@ -104,22 +111,19 @@ class Session
     OpenTaskResult openTask(std::uint64_t ID);
     void addTask(const std::string &name);
     bool deleteTask(std::uint64_t ID);
+    void changeTaskStatus();
+    bool getIsDone() const;
 
+    std::vector <Account*> getAvailableMembersAccounts() const;
+    std::vector <MemberView> getProjectMembersView() const;
     AddMemberResult addMember(std::uint64_t ID, Role role);
     DeleteMemberResult deleteMember(std::uint64_t ID);
 
 
 
-    ProjectMember* findMemberByID(std::uint64_t ID);
 
-    Task* findTaskByID(std::uint64_t ID);
 
-    void changeTaskStatus();
-    bool getIsDone() const;
 
-    void setCurrentAccount(Account* acc);
-    void setCurrentProject(Project* prj);
-    void setCurrentTask(Task* tsk);
 
     bool isLogged();
 

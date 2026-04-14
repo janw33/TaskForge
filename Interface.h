@@ -5,13 +5,13 @@ class Interface
 {
 //=========DATA====================
 	Session &session;
-//=========LOGIN=================== //done
+//=========LOGIN=================== 
 	void printMenu();
 
 	void signUp(); 
 	void login(); 
 
-//=========ACCOUNT================= //done
+//=========ACCOUNT================= 
 	void printAccountMenu();
 	
 	//show friend 
@@ -41,7 +41,7 @@ class Interface
 	void printMenuAccountSettings();
 	void changeUsername();
 	void changePassword();
-	void deleteAccount();
+	void deleteAccount(); // add project delete
 	void accountSettings();
 
 //=========PROJECT===================
@@ -49,7 +49,7 @@ class Interface
 	void printAdminProjectMenu();
 	void printOwnerProjectMenu();
 
-//---------Tasks--------------------- //done
+//---------Tasks--------------------- 
 	//show tasks
 	bool printTaskList(); 
 	void insideTask();
@@ -64,7 +64,7 @@ class Interface
 //---------Users---------------------
 	//show users
 	bool printAvailableUsersList();
-	bool printProjectMembers();
+	void printProjectMembers();
 
 	//add user 
 	void addUser();

@@ -37,8 +37,6 @@ void Interface::signUp()
 }
 void Interface::login()
 {
-    while(true)
-    {
         std::cout<<"Enter username: ";
         std::string username;
         std::getline(std::cin, username);
@@ -49,10 +47,9 @@ void Interface::login()
 
         switch(session.login(username, password)) {
             case LoginResult::SUCCESS : std::cout << "Logged in successfully\n"; return;
-            case LoginResult::INVALID_USERNAME : std::cout << "Username is wrong"; break;
-            case LoginResult::INVALID_PASSWORD : std::cout << "Password is wrong"; break;
+            case LoginResult::INVALID_USERNAME : std::cout << "Username is wrong\n"; break;
+            case LoginResult::INVALID_PASSWORD : std::cout << "Password is wrong\n"; break;
         }
-    }
 }
 
 void Interface::printAccountMenu()
@@ -79,7 +76,6 @@ bool Interface::printFriendsList() {
         return false;
     }
 
-    std::cout << "Enter friend ID\n";
     for(auto f : friends) std::cout << "[" << f->getID() << "] " << f -> getUsername() << '\n';
     return true;
 }
@@ -117,13 +113,14 @@ void Interface::addFriend(){
 
 void Interface::deleteFriend(){
     if(!printFriendsList()) return;
+    std::cout << "Enter friend ID\n";
 
     std::string IDStr;
     std::getline(std::cin, IDStr);
     std::uint64_t ID = std::stoull(IDStr);
 
     switch(session.deleteFriend(ID)) {
-        case DeleteFriendResult::SUCCESS : std::cout<<"Friend added successfully\n"; break;
+        case DeleteFriendResult::SUCCESS : std::cout<<"Friend deleted successfully\n"; break;
         case DeleteFriendResult::INVALID_ID : std::cout<<"Invalid ID\n"; break;
         case DeleteFriendResult::NOT_FRIEND : std::cout<<"This is not your friend\n"; break;
         case DeleteFriendResult::CANNOT_DELETE_SELF : std::cout<<"You cannont delete yourself\n"; break;
@@ -231,16 +228,16 @@ void Interface::insideOwnerProject()
 }
 void Interface::showProjects()
 {
-    printProjectList();
+    if(!printProjectList()) return;
 
     std::string IDStr;
     std::getline(std::cin, IDStr);
     std::uint64_t ID = std::stoull(IDStr);
 
     switch(session.openProject(ID)) {
-        case OpenProjectResult::OWNER : printOwnerProjectMenu(); break;
-        case OpenProjectResult::ADMIN : printAdminProjectMenu(); break; 
-        case OpenProjectResult::USER : printUserProjectMenu(); break;
+        case OpenProjectResult::OWNER : insideOwnerProject(); break;
+        case OpenProjectResult::ADMIN : insideAdminProject(); break; 
+        case OpenProjectResult::USER : insideUserProject(); break;
         case OpenProjectResult::INVALID_ID : std::cout << "Invalid ID\n"; break;
     }
 }
@@ -272,44 +269,22 @@ void Interface::deleteProject()
 
 
 bool Interface::printAvailableUsersList() {
+    auto availableMembers = session.getAvailableMembersAccounts();
 
-
-    const auto &friends = currentAccount -> getFriendsIDs();
-
-    if(friends.empty()) {
-        std::cout << "You have zero friends\n";
+    if(availableMembers.empty()) {
+        std::cout << "There are no available members\n";
         return false;
     }
+
     std::cout << "Enter friend ID\n";
-    for(auto ID : friends) {
-    if(!alreadyInProject(ID)) {
-    Account* f = storage.findAccountByID(ID);
-    if(f) std::cout << "[" << f->getID() << "] " << f -> getUsername() << '\n'; }
-    }
+    for(auto acc : availableMembers) std::cout << "[" << acc->getID() << "] " << acc -> getUsername() << '\n'; 
 
     return true;
 }
-bool Interface::printProjectMembers() {
-    auto currentProject = session.getCurrentProject();
-    if(!currentProject) {
-        std::cout << "Error\n";
-        return false;
-    }
-    
-    const auto& members = currentProject -> getProjectMembers();
+void Interface::printProjectMembers() {
+    auto members = session.getProjectMembersView();
 
-    if(members.empty()) {
-        std::cout << "There is zero project members\n";
-        return false;
-    }
-
-    std::cout << "Enter member ID\n";
-    for(const auto& member : members) {
-        auto acc = storage.findAccountByID(member.getID());
-        std::cout << "[" << acc -> getID() << "] " << acc -> getUsername() << " " << member.roleToString() << '\n';
-    }
-
-    return true;
+    for(const auto& member : members) std::cout << "[" << member.ID << "] " << member.username << " " << member.role << '\n';
 }
 
 void Interface::addUser() {
@@ -343,7 +318,8 @@ void Interface::addUser() {
 }   
 
 void Interface::deleteUser(){
-    if(!printProjectMembers()) return;
+    std::cout << "Enter member ID\n";
+    printProjectMembers();
 
     std::string IDStr;
     std::getline (std::cin, IDStr);
