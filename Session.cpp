@@ -1,7 +1,7 @@
 #include "Session.h"
 
 Session::Session(Storage &storage)
-    :storage(storage), currentAccount(nullptr), currentProject(nullptr), currentTask(nullptr)
+    :storage(storage), currentAccountID(0), currentProjectID(0), currentTaskID(0)
 {
 }
 
@@ -10,26 +10,34 @@ Session::Session(Storage &storage)
 RegisterResult Session::signUp(const std::string &username, const std::string &password) {
     if(storage.isUsernameTaken(username)) return RegisterResult::USERNAME_TAKEN;
 
-    auto newAccount = storage.addAccount(username, password);
+    auto newAccountID = storage.addAccount(username, password);
 
-    currentAccount = newAccount;
+    currentAccountID = newAccountID;
+
     return RegisterResult::SUCCESS;
 }
 
 LoginResult Session::login(const std::string &username, const std::string &password) {
-    auto acc = storage.findAccountByUsername(username);
+    std::uint64_t ID = storage.findAccountIDByUsername(username);
 
-    if(!acc) return LoginResult::INVALID_USERNAME;
+    if(ID == 0) return LoginResult::INVALID_USERNAME;
+
+    Account* acc = storage.findAccountByID(ID);
+    assert(acc);
+
     if(acc -> getPassword() != password) return LoginResult::INVALID_PASSWORD;
 
-    currentAccount = acc;
+    currentAccountID = ID;
     return LoginResult::SUCCESS;
 }
 
 
 
 ChangeUsernameResult Session::changeUsername(const std::string &newUsername) {
-    assert(currentAccount && "No user logged in!");
+    assert(currentAccountID != 0 && "No user logged in!");
+
+    Account* currentAccount = storage.findAccountByID(currentAccountID);
+    assert(currentAccount);
 
     if(currentAccount -> getUsername() == newUsername) return ChangeUsernameResult::SAME_AS_OLD;
     if(storage.isUsernameTaken(newUsername)) return ChangeUsernameResult::USERNAME_TAKEN;
@@ -39,7 +47,11 @@ ChangeUsernameResult Session::changeUsername(const std::string &newUsername) {
 }
 
 ChangePasswordResult Session::changePassword(const std::string &newPassword) {
-    assert(currentAccount && "No user logged in!");
+    assert(currentAccountID != 0 && "No user logged in!");
+
+    Account* currentAccount = storage.findAccountByID(currentAccountID);
+    assert(currentAccount);
+
     if(currentAccount -> getPassword() == newPassword) return ChangePasswordResult::SAME_AS_OLD;
 
     currentAccount->setPassword(newPassword);
@@ -47,7 +59,11 @@ ChangePasswordResult Session::changePassword(const std::string &newPassword) {
 }
 
 DeleteAccountResult Session::deleteAccount() {
-    assert(currentAccount && "No user logged in!");
+    assert(currentAccountID != 0 && "No user logged in!");
+
+    Account* currentAccount = storage.findAccountByID(currentAccountID);
+    assert(currentAccount);
+    
     auto projects = currentAccount->getProjectsIDs();
 
     for(auto projectID : projects) {
@@ -61,7 +77,7 @@ DeleteAccountResult Session::deleteAccount() {
             else prj -> deleteMember(currentAccount -> getID());
     }
 
-    storage.deleteAccount(currentAccount -> getID());
+    storage.deleteAccount(currentAccount -> getID(), currentAccount -> getUsername());
     logout();
     return DeleteAccountResult::SUCCESS;
 }
@@ -69,31 +85,39 @@ DeleteAccountResult Session::deleteAccount() {
 
 
 std::vector<Account> Session::getAvailableAccounts() const {
-    assert(currentAccount && "No user logged in!");
+    assert(currentAccountID != 0 && "No user logged in!");
+
+    Account* currentAccount = storage.findAccountByID(currentAccountID);
+    assert(currentAccount);
+
     std::vector <Account> result;
 
     const auto& friends = currentAccount->getFriendsIDs();
 
-    for (const auto& account : storage.getAccounts()) {
+    for (const auto& [id, acc] : storage.getAccounts()) {
 
-        if (account.getID() == currentAccount->getID()) continue;
+        if (id == currentAccount->getID()) continue;
 
         bool isFriend = false;
 
         for (auto friendID : friends) {
-            if (friendID == account.getID()) {
+            if (friendID == acc.getID()) {
                 isFriend = true;
                 break;
             }
         }
 
-        if (!isFriend) result.push_back(account);
+        if (!isFriend) result.push_back(acc);
     }
     return result;
 }
 
 std::vector<Account*> Session::getCurrentUserFriends() const {
-    assert(currentAccount && "No user logged in!");
+    assert(currentAccountID != 0 && "No user logged in!");
+
+    Account* currentAccount = storage.findAccountByID(currentAccountID);
+    assert(currentAccount);
+
     std::vector <Account*> result;
 
     for(auto friendID : currentAccount -> getFriendsIDs()) {
@@ -105,7 +129,11 @@ std::vector<Account*> Session::getCurrentUserFriends() const {
 }
 
 AddFriendResult Session::addFriend(std::uint64_t ID) {
-    assert(currentAccount && "No user logged in!");
+    assert(currentAccountID != 0 && "No user logged in!");
+
+    Account* currentAccount = storage.findAccountByID(currentAccountID);
+    assert(currentAccount);
+
     if(ID == currentAccount -> getID()) return AddFriendResult::CANNOT_ADD_SELF;
 
     Account* friendAccount = storage.findAccountByID(ID);
@@ -119,7 +147,11 @@ AddFriendResult Session::addFriend(std::uint64_t ID) {
 }
 
 DeleteFriendResult Session::deleteFriend(std::uint64_t ID) {
-    assert(currentAccount && "No user logged in!");
+    assert(currentAccountID != 0 && "No user logged in!");
+
+    Account* currentAccount = storage.findAccountByID(currentAccountID);
+    assert(currentAccount);
+
     if(ID == currentAccount -> getID()) return DeleteFriendResult::CANNOT_DELETE_SELF;
 
     Account* friendAccount = storage.findAccountByID(ID);
@@ -135,8 +167,11 @@ DeleteFriendResult Session::deleteFriend(std::uint64_t ID) {
 
 
 std::vector<Project*> Session::getCurrentUserProjects() const {
-    assert(currentAccount && "No user logged in!");
+    assert(currentAccountID != 0 && "No user logged in!");
     std::vector <Project*> result;
+
+    Account* currentAccount = storage.findAccountByID(currentAccountID);
+    assert(currentAccount);
 
     for(auto projectID : currentAccount -> getProjectsIDs()) {
         auto project = storage.findProjectByID(projectID);
@@ -147,12 +182,17 @@ std::vector<Project*> Session::getCurrentUserProjects() const {
 }
 
 OpenProjectResult Session::openProject(std::uint64_t ID) {
-    assert(currentAccount && "No user logged in!");
+    assert(currentAccountID != 0 && "No user logged in!");
 
-    Project* prj = storage.findProjectByID(ID);
-    if(!prj) return OpenProjectResult::INVALID_ID;
+    Account* currentAccount = storage.findAccountByID(currentAccountID);
+    assert(currentAccount);    
 
-    currentProject = prj;
+    if(!currentAccount -> ProjectValidator(ID)) return OpenProjectResult::INVALID_ID;
+
+    currentProjectID = ID;
+
+    Project* currentProject = storage.findProjectByID(currentProjectID);
+    assert(currentProject);
 
     ProjectMember* member = currentProject -> findMemberByID(currentAccount -> getID());
     if(!member) return OpenProjectResult::INVALID_ID;
@@ -165,13 +205,20 @@ OpenProjectResult Session::openProject(std::uint64_t ID) {
 }
 
 void Session::addProject(const std::string &name) {
-    assert(currentAccount && "No user logged in!");
+    assert(currentAccountID != 0 && "No user logged in!");
+
+    Account* currentAccount = storage.findAccountByID(currentAccountID);
+    assert(currentAccount);
+
     std::uint64_t projectID = storage.addProject(name, currentAccount -> getID(), Role::OWNER);
     currentAccount -> addProjectID (projectID);
 }
 
 DeleteProjectResult Session::deleteProject(std::uint64_t ID) {
-    assert(currentAccount && "No user logged in!");
+    assert(currentAccountID != 0 && "No user logged in!");
+
+    Account* currentAccount = storage.findAccountByID(currentAccountID);
+    assert(currentAccount);
 
     Project* project = storage.findProjectByID(ID);
     if (!project) return DeleteProjectResult::INVALID_ID;
@@ -188,8 +235,12 @@ DeleteProjectResult Session::deleteProject(std::uint64_t ID) {
 
 
 std::vector <Task> Session::getCurrentProjectTasks() const{
-    assert(currentProject && "No project opened!");
+    assert(currentProjectID != 0 && "No project opened!");
     std::vector <Task> result;
+
+    Project* currentProject = storage.findProjectByID(currentProjectID);
+    assert(currentProject);
+
     for(const auto& task : currentProject -> getTasks()) {
         result.push_back(task);
     }
@@ -198,34 +249,63 @@ std::vector <Task> Session::getCurrentProjectTasks() const{
 }
 
 OpenTaskResult Session::openTask(std::uint64_t ID) {
-    assert(currentProject && "No project opened!");
-    Task* tsk = currentProject -> findTaskByID(ID);
+    assert(currentProjectID != 0 && "No project opened!");
 
-    if(!tsk) return OpenTaskResult::INVALID_ID;
+    Project* currentProject = storage.findProjectByID(currentProjectID);
+    assert(currentProject);
 
-    currentTask = tsk;
+    if(!currentProject -> taskValidator(ID)) return OpenTaskResult::INVALID_ID;
+
+    currentTaskID = ID;
     return OpenTaskResult::SUCCESS;
 }
 
 void Session::addTask(const std::string &name){
-    assert(currentProject && "No project opened!");
+    assert(currentProjectID != 0 && "No project opened!");
+
+    Project* currentProject = storage.findProjectByID(currentProjectID);
+    assert(currentProject);
+
     currentProject -> addTask(name);
 }
 bool Session::deleteTask(std::uint64_t ID) {
-    assert(currentProject && "No project opened!");
-    if(currentProject -> deleteTask(ID)) return true;
-    else return false;
+    assert(currentProjectID != 0 && "No project opened!");
+
+    Project* currentProject = storage.findProjectByID(currentProjectID);
+    assert(currentProject);
+
+    return currentProject -> deleteTask(ID);
 }
 void Session::changeTaskStatus(){
+    assert(currentProjectID != 0 && "No project opened!");
+
+    Project* currentProject = storage.findProjectByID(currentProjectID);
+    assert(currentProject);
+
+    Task* currentTask = currentProject -> findTaskByID(currentTaskID);
+    assert(currentTask);
+
     currentTask -> changeStatus();
 }
 bool Session::getIsDone() const{
+     assert(currentProjectID != 0 && "No project opened!");
+
+    Project* currentProject = storage.findProjectByID(currentProjectID);
+    assert(currentProject);
+
+    Task* currentTask = currentProject -> findTaskByID(currentTaskID);
+    assert(currentTask);
+
     return currentTask -> getIsDone();
 }
 
 
-bool Session::alreadyInProject(std::uint64_t ID) const{
-    assert(currentProject && "No project opened!");
+bool Session::alreadyInProject(std::uint64_t ID) const{ // do projektu to dodaj
+    assert(currentProjectID != 0 && "No project opened!");
+
+    Project* currentProject = storage.findProjectByID(currentProjectID);
+    assert(currentProject != nullptr);
+    
     for (const auto& member : currentProject -> getProjectMembers()){
         if (ID == member.getID()) {
             return true;
@@ -237,9 +317,12 @@ bool Session::alreadyInProject(std::uint64_t ID) const{
 
 
 std::vector <Account*> Session::getAvailableMembersAccounts() const {
-    assert(currentProject && "No project opened!");
+    assert(currentAccountID != 0 && "User not logged in!");
 
     std::vector <Account*> result;
+    
+    Account* currentAccount = storage.findAccountByID(currentAccountID);
+    assert(currentAccount);
 
     for(auto friendID : currentAccount -> getFriendsIDs()) {
         if(!alreadyInProject(friendID)) {
@@ -252,11 +335,17 @@ std::vector <Account*> Session::getAvailableMembersAccounts() const {
 }
 
 std::vector <MemberView> Session::getProjectMembersView() const{
-    assert(currentProject && "No project opened!");
+    assert(currentProjectID != 0 && "No project opened!");
 
     std::vector <MemberView> result;
+
+    Project* currentProject = storage.findProjectByID(currentProjectID);
+    assert(currentProject);
+
     for(const auto& member : currentProject -> getProjectMembers()) {
         auto acc = storage.findAccountByID(member.getID());
+        assert(acc != nullptr && "Member account should exist!");
+
         result.push_back({
             member.getID(), 
             acc -> getUsername(), 
@@ -268,51 +357,56 @@ std::vector <MemberView> Session::getProjectMembersView() const{
 }
 
 AddMemberResult Session::addMember(std::uint64_t ID, Role role) {
-    assert(currentProject && "No project opened!");
+    assert(currentProjectID != 0 && "No project opened!");
 
     if(alreadyInProject(ID)) return AddMemberResult::ALREADY_IN_PROJECT;
 
     auto member = storage.findAccountByID(ID);
     if(!member) return AddMemberResult::INVALID_ID;
 
+    Project* currentProject = storage.findProjectByID(currentProjectID);
+    assert(currentProject);
     currentProject -> addMember(ID, role);
-    member -> addProjectID(currentProject -> getID());
+    member -> addProjectID(currentProjectID);
 
     return AddMemberResult::SUCCESS;
 }
 
 DeleteMemberResult Session::deleteMember(std::uint64_t ID) {
-    assert(currentProject && "No project opened!");
+    assert(currentProjectID != 0 && "No project opened!");
 
-    if(currentAccount -> getID() == ID) return DeleteMemberResult::CANNOT_DELETE_SELF;
+    if(currentAccountID == ID) return DeleteMemberResult::CANNOT_DELETE_SELF;
 
     auto member = storage.findAccountByID(ID);
     if(!member) return DeleteMemberResult::INVALID_ID;
 
     if(!alreadyInProject(ID)) return DeleteMemberResult::IS_NOT_MEMBER;
 
+    Project* currentProject = storage.findProjectByID(currentProjectID);
+    assert(currentProject);
+
     currentProject -> deleteMember(ID);
-    member -> deleteProjectID(currentProject -> getID());
+    member -> deleteProjectID(currentProjectID);
     return DeleteMemberResult::SUCCESS;
 
 }
 
 
 
-bool Session::isLogged() {
-    return currentAccount != nullptr;
+bool Session::isLogged() const{
+    return currentAccountID != 0;
 }
 
 
 
 void Session::logout() {
-    currentAccount = nullptr;
-    currentProject = nullptr;
-    currentTask = nullptr;
+    currentAccountID = 0;
+    currentProjectID = 0;
+    currentTaskID = 0;
 }
 void Session::exitProject() {
-    currentProject = nullptr;
+    currentProjectID = 0;
 }
 void Session::exitTask() {
-    currentTask = nullptr;
+    currentTaskID = 0;
 }

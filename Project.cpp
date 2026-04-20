@@ -71,3 +71,12 @@ void Project::deleteMember(std::uint64_t ID) {
     size_t index = findMemberIndexByID (ID);
     members.erase(members.begin() + index);
 }
+
+
+
+bool Project::taskValidator(std::uint64_t ID) {
+    for(size_t i = 0; i < tasks.size(); i++)
+        if (ID == tasks[i].getID()) return true;
+        
+    return false;
+}

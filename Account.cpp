@@ -80,3 +80,12 @@ bool Account::isHeMyFriend(std::uint64_t ID) {
 
     return false;
 }
+
+
+
+bool Account::ProjectValidator(std::uint64_t ID) {
+    for(size_t i = 0; i < friendsIDs.size(); i++) 
+        if(friendsIDs[i] == ID) return true;
+
+    return false;
+}

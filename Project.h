@@ -32,4 +32,6 @@ public:
 	void addMember(std::uint64_t ID, Role role);
 	size_t findMemberIndexByID(std::uint64_t ID);
 	void deleteMember(std::uint64_t ID);
+
+	bool taskValidator(std::uint64_t ID);
 };

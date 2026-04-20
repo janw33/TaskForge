@@ -7,8 +7,8 @@ Storage::Storage()
 
 
 Account* Storage::findAccountByID(std::uint64_t ID) {
-    for(size_t i = 0; i < accounts.size(); i++) 
-        if(accounts[i].getID() == ID) return &accounts[i];
+    auto it = accounts.find(ID);
+    if(it != accounts.end()) return &it -> second;
 
     return nullptr;
 }
@@ -16,62 +16,72 @@ Account* Storage::findAccountByID(std::uint64_t ID) {
 
 
 bool Storage::isUsernameTaken(const std::string &username) {
-    for (const auto& acc : accounts)
-        if (acc.getUsername() == username) return true;
+    auto it = accountUsernameToID.find(username);
+    if(it != accountUsernameToID.end()) return true;
 
     return false;
 }
-Account* Storage::addAccount(const std::string &username, const std::string &password) {
-    accounts.emplace_back(username, password, nextAccountID++);
-    return &accounts.back();
+std::uint64_t Storage::addAccount(const std::string &username, const std::string &password) {
+    std::uint64_t accountID = nextAccountID++;
+
+    accounts.emplace(accountID, Account(username, password, accountID));
+    accountUsernameToID.emplace(username, accountID);
+
+    return accountID;
 }
 
-Account* Storage::findAccountByUsername(const std::string &username) {
-    for(size_t i = 0; i < accounts.size(); i++) {
-        if(accounts[i].getUsername() == username) return &accounts[i];
-    }
-
-    return nullptr;
-}
-
-
-size_t Storage::findAccountIndexByID(std::uint64_t ID) {
-    for(size_t i = 0; i < accounts.size(); i++) if(accounts[i].getID() == ID) return i;
+std::uint64_t Storage::findAccountIDByUsername(const std::string &username) {
+    auto it = accountUsernameToID.find(username);
+    if(it != accountUsernameToID.end()) return it -> second;
 
     return 0;
 }
-void Storage::deleteAccount(std::uint64_t ID) {
-    std::ptrdiff_t index = findAccountIndexByID(ID);
-    accounts.erase(accounts.begin() + index);
+
+
+
+void Storage::deleteAccount(std::uint64_t ID, const std::string &username) {
+    auto acc = findAccountByID(ID);
+    if(!acc) return;
+
+    auto projects = acc->getProjectsIDs();
+
+    for(auto project : projects) {
+        deleteProject(project);
+    }
+
+    accounts.erase(ID);
+    accountUsernameToID.erase(username);
 }
 
 Project* Storage::findProjectByID(std::uint64_t ID){
-    for(size_t i = 0; i < projects.size(); i++) 
-        if (projects[i].getID() == ID) return &projects[i];
-    
+    auto it = projects.find(ID);
+    if(it != projects.end()) return &it -> second;
 
     return nullptr;
 }
 std::uint64_t Storage::addProject(const std::string &name, std::uint64_t userID, Role role) {
     std::uint64_t nextID = nextProjectID++;
-    projects.emplace_back(name, nextID, userID, role);
+    projects.emplace(nextID, Project(name, nextID, userID, role));
 
     return nextID;
 }
-size_t Storage::findProjectIndexByID(std::uint64_t ID) {
-    for(size_t i = 0; i < projects.size(); i++) if (projects[i].getID() == ID) return i;
 
-    return 0;
-}
+
+
 void Storage::deleteProject(std::uint64_t ID) {
-    for(auto &acc : accounts) acc.deleteProjectID(ID);
-    
-    std::ptrdiff_t index = findProjectIndexByID(ID);
-    projects.erase(projects.begin() + index);
+    Project* prj = findProjectByID(ID);
+    if (!prj) return;
+
+    for (const auto& member : prj->getProjectMembers()) {
+        Account* acc = findAccountByID(member.getID());
+        if (acc) acc->deleteProjectID(ID);
+    }
+
+    projects.erase(ID);
 }
 
 
 
-const std::vector<Account> &Storage::getAccounts() const {
+const std::unordered_map<uint64_t, Account> &Storage::getAccounts() const {
     return accounts;
 }

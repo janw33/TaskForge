@@ -32,4 +32,6 @@ class Account
 	void addFriend(std::uint64_t ID);
 	void deleteFriend(std::uint64_t ID);
 	bool isHeMyFriend(std::uint64_t ID);
+
+	bool ProjectValidator(std::uint64_t ID);
 };

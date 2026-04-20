@@ -83,9 +83,10 @@ class Session
 {
     private:
     Storage &storage;
-    Account* currentAccount;
-    Project* currentProject;
-    Task* currentTask;
+    std::uint64_t currentAccountID;
+    std::uint64_t currentProjectID;
+    std::uint64_t currentTaskID;
+
 
     bool alreadyInProject(std::uint64_t ID) const;
     public:
@@ -119,13 +120,7 @@ class Session
     AddMemberResult addMember(std::uint64_t ID, Role role);
     DeleteMemberResult deleteMember(std::uint64_t ID);
 
-
-
-
-
-
-
-    bool isLogged();
+    bool isLogged() const;
 
     void logout();
     void exitProject();
